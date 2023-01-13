@@ -1,0 +1,15 @@
+ArXiv:
+	Attention is all you need
+		https://arxiv.org/pdf/1706.03762.pdf
+
+Papers with code:
+	Overview
+		https://paperswithcode.com/method/vision-transformer
+	Semantic Segmentation
+		https://paperswithcode.com/paper/segmenter-transformer-for-semantic
+	Representation Segmentation
+		https://paperswithcode.com/paper/representation-separation-for-semantic
+		No code - released shortly
+	Segmenter
+		https://paperswithcode.com/paper/segmenter-transformer-for-semantic
+		https://github.com/rstrudel/segmenter
