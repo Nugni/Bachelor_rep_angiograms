@@ -3,13 +3,15 @@ ArXiv:
 		https://arxiv.org/pdf/1706.03762.pdf
 
 Papers with code:
-	Overview
+	Overview transformer
 		https://paperswithcode.com/method/vision-transformer
-	Semantic Segmentation
+	Semantic Segmentation transformer
 		https://paperswithcode.com/paper/segmenter-transformer-for-semantic
-	Representation Segmentation
+	Representation Segmentation transformer
 		https://paperswithcode.com/paper/representation-separation-for-semantic
 		No code - released shortly
-	Segmenter
+	Segmenter transformer m. kode
 		https://paperswithcode.com/paper/segmenter-transformer-for-semantic
 		https://github.com/rstrudel/segmenter
+	Simpel ViT implementation 
+		https://keras.io/examples/vision/image_classification_with_vision_transformer/
