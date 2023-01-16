@@ -7,23 +7,23 @@ Projektet:
 		Transformer
 	Autentisk data annoteres
 	Modeller videretrænes på autentisk data
-	
+
 Forslag fra folk
 	ResNet og Unet i kombination
 		https://arxiv.org/abs/1904.00592
 		https://github.com/Cavtheman/degridifier
 		https://www.kaggle.com/code/firqaaa/residual-unet-keras-implementation
 		https://towardsdatascience.com/u-nets-with-resnet-encoders-and-cross-connections-d8ba94125a2c
-		
+
 Skrive til Jon
 	Hvad er realistik ift. blood-flow-estimation?
 
-
-
 Evt. finde modeller
-	U-net			Bachelor-projekt fra sidste år/Filippas U-net
-					1 uge tilpasse og tune, 1 uge til træning
-					https://github.com/D-Gaard/bachelor
-	Transformer		Strudel segmenter.
-					3 uger til at forstå og alve, 1 uge til træning
-					https://github.com/rstrudel/segmenter
+	U-net
+		Bachelor-projekt fra sidste år/Filippas U-net
+		1 uge tilpasse og tune, 1 uge til træning
+		https://github.com/D-Gaard/bachelor
+	Transformer
+		Strudel segmenter.
+		3 uger til at forstå og alve, 1 uge til træning
+		https://github.com/rstrudel/segmenter
