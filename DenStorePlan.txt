@@ -1,5 +1,7 @@
+Segmentering af blodårer i angiogrammer vha præ-træning med generative modeller
+
 Projektet:
-	Syntetisk data laves ud fra MAEs kode
+	Syntetisk data laves (ud fra MAEs kode?)
 	Syntetisk data tilføjes støj
 	Syntetisk data segmenteres og annoteres
 	Modeller trænes på syntetisk data
@@ -7,6 +9,7 @@ Projektet:
 		Transformer
 	Autentisk data annoteres
 	Modeller videretrænes på autentisk data
+	Evt. blood-flow-estimation
 
 Forslag fra folk
 	ResNet og Unet i kombination
@@ -27,3 +30,56 @@ Evt. finde modeller
 		Strudel segmenter.
 		3 uger til at forstå og alve, 1 uge til træning
 		https://github.com/rstrudel/segmenter
+
+Si woo - Kandidatstuderende - samme projekt, spørg om hjælp til praktiske ting.
+	Har tænkt sig at arbejde med regularisere, Bayess-teorem: P(M|D) = P(D|M) P(M) / P(D)
+	P(M) er regularisering-led
+
+Præ-træning er en god ide.
+	Generativ model, 2 metoder
+		Neuralt Netværk
+		I hånden
+	Lave træ-generator, der skaber billeder, der antager fladhed på overfladen.
+		PhD-artikel omkring nyre
+		Støj er additiv, normalt-fordelt eller evt. laPlace-fordelt
+	Træn på syntetisk data for optimering
+	Validér på autentisk data
+	
+Trægenerator:
+	Starter i et punkt
+		Sandsynlighed for vinkel
+		Sandsynlighed for længde
+	Bifurkation
+		Sandsynlighed for 2 vinkler
+		Sandsynlighed for længder
+	Tegneværktøj til at skabe projektioner
+	Evt. røntgen-værktøj på internettet
+		SÅ SIMPELT SOM MULIGT TIL AT STARTE MED
+
+Cyklisk udvikling: MVP -> Udvikling -> VP1 -> Udvikling -> VP2
+
+Sammenligne to netværk. 
+
+Vigtig formulering i beskrivelse: "som fx"
+Data er tilgængelig.
+30 minutter om ugen, justering efter behov
+	starter i flok, præsentationer for hinanden
+SCRUM med Trello
+	Kontrakt som story
+	Møder som sprint
+	Trello som backlog, stor backlog
+		Efterhånden bliver det klumper, der kan puttes direkte i rapporten
+	Vedligehold af fælles to-do-liste, der bliver arbejdet på.
+
+
+Forventning er, at der bliver arbejdet med tingene
+
+
+VIGTIGT: Det, vi aftaler, er noget, der afspejler sig fysisk.
+	Ellers bliver mødet ikke brugt til noget konstruktivt.
+
+"Det vigtige er, at I laver noget fornuftigt."
+
+Det der skal læses af Jon skal være i små klumper - 2-3 sider
+	Ellers kommer det i den store bunke, hvor det forsvinder
+	Responstid på minimum 24 timer.
