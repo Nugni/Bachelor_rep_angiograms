@@ -1,0 +1,30 @@
+Dato for aflevering af projektrapport
+	12/6-23 kl 12.00
+
+Sprog
+	Engelsk
+
+Bachelorprojektets titel
+	Segmentering af blodårer i angiogrammer vha præ-træning med generative modeller
+
+Nærmere beskrivelse
+We will use a generative model to generate a simple 2D visual approximation of a heart's blood vessels as seen on angiograms. We will use this model to generate synthetic data.
+To this data we will add noise simulating the noise that will be on actual angiograms.
+We will then train 2 machine learning models, e.g. a Unet and Visual Transformer, on the synthetic data.
+These models should perform semantic segmentation of the blood vessels in the noisy synthetic data.
+We wish for the semantic segmentation to resemble the synthetic data without noise as closely as possible.
+Afterwards we will train the 2 models on actual angiograms. Data is available.
+Lastly we will compare the 2 models.
+
+Møder
+	En halv time en gang om ugen. Hvis der er behov for mere senere i forløbet, justeres dette.
+Forventes af vejleder
+	Det forventes at vejleder læser det tilsendte, såfremt det overholder det aftalte. Fx max 2-3 sider i god tid, min 24 timer, før møde
+Forventes af de studerende
+	Der bliver arbejdet med projektet.
+	Der skabes noget konkret, fx graf, tekst, kode, imellem møderne, der kan præsenteres
+Andet
+	Benyttelse af pseudo-SCRUM
+	Projektet som story
+	Møder som sprint
+	Trello benyttes som organiseringsværktøj af projektdele
