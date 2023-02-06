@@ -1,0 +1,18 @@
+
+
+Hvornår vi mødes
+	Mandag, tirsdag, onsdag, torsdag og fredag 9-15 (akademisk kvarter inkluderet)
+	I alt 25 timer
+
+	Tirsdag eftermiddag sætter vi os fast på hvad vi sidder fast med
+
+
+Tidspunkter vi ikke kan mødes (blok 3):
+	mandag 15-17
+	onsdag 15-17
+	evt. fredag 9-13
+
+
+Arbejdsmoral
+	Vi arbejder ikke i weekenden (umiddelbart)
+	Vi må gerne prøve at problemløse selv e.g. debugging 
