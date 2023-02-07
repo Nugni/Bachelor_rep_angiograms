@@ -21,3 +21,5 @@ Papers with code:
 Interesting sites:
 	LindenMeyer systems (for data generation)
 		https://jsantell.com/l-systems/
+	paper on L-system and arteries
+		https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2229505/
