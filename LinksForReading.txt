@@ -15,3 +15,9 @@ Papers with code:
 		https://github.com/rstrudel/segmenter
 	Simpel ViT implementation 
 		https://keras.io/examples/vision/image_classification_with_vision_transformer/
+
+
+
+Interesting sites:
+	LindenMeyer systems (for data generation)
+		https://jsantell.com/l-systems/
