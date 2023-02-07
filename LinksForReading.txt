@@ -23,3 +23,5 @@ Interesting sites:
 		https://jsantell.com/l-systems/
 	paper on L-system and arteries
 		https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2229505/
+	L-systems (Lottes bachelor)
+		https://futhark-lang.org/student-projects/lotte-ulrik-bsc-thesis.pdf
