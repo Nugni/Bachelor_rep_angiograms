@@ -28,4 +28,8 @@ Interesting sites:
 	L-systems i python
 		https://www.pythoninformer.com/generative-art/grammars/l-systems-trees/
 		https://ahradwani.com/2019/11/05/python-and-lindenmayer-system-p3/
+
+Interesting python
+	Turtle
+	PyTorch
 		
