@@ -1,7 +1,6 @@
 
 Spørgsmål til Jon
-	Havde Jon en generativ model i tankerne? (fra et paper)
-	Paper hvori der stod noget om biforcation mht. blodårer
+	Er der mere end 2 hjerter fotograferet i dataen? For det er det vi har fundet indtil videre
 
 
 Spørgsmål på længere sigt
