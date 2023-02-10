@@ -1,43 +1,70 @@
 import turtle
+import random
 
-turtle.tracer()
+# Initial Conditions
+turtle.tracer(False)
 turtle.hideturtle()
 turtle.screensize(736,736)
 turtle.radians()
 
+# random values
+alpha = random.random()
+angleMed = 0.3
+def angleVar(): return random.gauss(0,0.3)
+def angleNew(): return angleMed + angleVar()
+lenMed = 40
+def lenVar(): return random.gauss(0,40)
+def lenNew(): return lenMed + lenVar()
 
+
+
+# Set turtles position, heading and width.
+# Used to reset turtle position to 
 def turtleSet(pos,angle,width):
-    turtle.pu()
+    turtle.penup()
     turtle.setpos(pos)
     turtle.setheading(angle)
     turtle.width(width)
-    turtle.pd()
-    
+    turtle.pendown()
 
-
-def turtleWalk(pos,angle,w):
-    if w == 0:
+# Makes an image of angiogram-like structure
+def turtleWalk(pos,angle,width):
+    # Recursion Base Case
+    if width == 0:
         return
     
+    # Establish recursion point
     orgPos = turtle.position()
     orgAngle = turtle.heading()
+    turtle.width(width)
     
-    turtleSet(orgPos, orgAngle, w)
+    # Biggest child
+    turtle.left(angleNew())
+    turtle.forward(lenNew())
+    turtleWalk(turtle.position(), turtle.heading(), width-1)
     
-    turtle.left(0.5)
-    turtle.forward(40)
-    turtleWalk(turtle.position(), turtle.heading(), w-1)
+    # Reset position
+    turtleSet(orgPos,orgAngle,width)
     
-    turtleSet(orgPos,orgAngle,w)
-    
-    turtle.right(0.5)
-    turtle.forward(40)
-    turtleWalk(turtle.position(), turtle.heading(), w-1)
+    # Smallest Child
+    turtle.right(angleNew())
+    turtle.forward(lenNew())
+    turtleWalk(turtle.position(), turtle.heading(), width-1)
 
 turtleWalk((400,400), 0, 5)
 
 
+angio = turtle.getcanvas()
 
+angio.postscript(file="test_angio.ps")
 
 turtle.done()
+
 turtle.bye()
+#%%
+import numpy as np
+img = np.loadtxt("test_angio.ps")
+
+
+
+
