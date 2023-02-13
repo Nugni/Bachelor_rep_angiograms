@@ -15,6 +15,7 @@ def getRandomAlpha():
     alpha = ran.random()
     return alpha
 
+
 # Child and parent arteries diameter ratios
 def getLambda(numerator,alpha):
     return numerator/(1+alpha**3)**(1/3)
@@ -23,6 +24,7 @@ def getLambdas(alpha):
     lambda1 = getLambda(1,alpha)
     lambda2 = getLambda(alpha,alpha)
     return lambda1, lambda2
+
 
 # Child and parent arteries length ratios
 def getGamma(alpha):
@@ -44,5 +46,6 @@ def getTheta2(alpha):
     denumenator = 2*alpha**2*(1+alpha**3)**(2/3)
     return math.acos(numerator/denumenator)
 
+#bifurcation angels
 def getThetas(alpha):
     return getTheta1(alpha), getTheta2(alpha)
