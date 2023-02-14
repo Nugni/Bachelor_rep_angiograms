@@ -86,8 +86,8 @@ def drawNode(node, draw):
     else:
         return
 
-#Generate tree
-#Makes a treewalk, and finds minimum and maximum x, y values for tree
+
+#Generates the tree as a 2D numpy array
 def genTree(tree, dim):
     img = Image.new("1", dim)
     draw = ImageDraw.Draw(img)
@@ -95,6 +95,7 @@ def genTree(tree, dim):
     img = np.array(img)
     return img
 
+#generates and plots a tree
 def drawTree(tree, dim):
     img = genTree(tree, dim) * 255
     plt.imshow(img,cmap="gray", vmin=0, vmax=255)
