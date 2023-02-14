@@ -39,13 +39,28 @@ def getGammas(alpha):
 def getTheta1(alpha):
     numerator = (1+alpha**3)**(4/3)+1-alpha**4
     denumenator = 2*(1+alpha**3)**(2/3)
-    return math.acos(numerator/denumenator)
+    cosTheta = numerator/denumenator
+    if cosTheta > 1:
+        cosTheta = 1
+    if cosTheta < -1:
+        cosTheta = 1
+    return math.acos(cosTheta)
 
 def getTheta2(alpha):
     numerator = (1+alpha**3)**(4/3)+alpha**4-1
     denumenator = 2*alpha**2*(1+alpha**3)**(2/3)
-    return math.acos(numerator/denumenator)
+    cosTheta = numerator/denumenator
+    if cosTheta > 1:
+        cosTheta = 1
+    if cosTheta < -1:
+        cosTheta = 1
+    return math.acos(cosTheta)
 
-#bifurcation angels
+# bifurcation angels
 def getThetas(alpha):
     return getTheta1(alpha), getTheta2(alpha)
+
+
+# gets All parameters
+def getAllParameters(alpha):
+    return getLambdas(alpha), getThetas(alpha)
