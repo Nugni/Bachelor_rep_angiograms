@@ -39,7 +39,7 @@ back_col, art_col = gen_colors()
 print("background color: {0}, artery color: {1}".format(back_col, art_col))
 
 
-#make a tree
+#make a tree. For now constants are hardcoded, this is to be generalized. 
 tree1 = Tree(0, 362, 15, 15, 0, 2)
 #hack to ensure array is int arr not bool arr
 synTree = np.array(genTree(tree1, (736, 736))).astype(int)
