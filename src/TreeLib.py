@@ -95,10 +95,10 @@ def genTree(tree, dim):
     img = np.array(img)
     return img
 
-#generates and plots a tree
-def drawTree(tree, dim):
-    img = genTree(tree, dim) * 255
-    plt.imshow(img,cmap="gray", vmin=0, vmax=255)
+#generates and plots an arr (with values 0-1)
+def drawTree(arr):
+    #img = genTree(tree, dim) * 255
+    plt.imshow(arr*255, cmap="gray", vmin=0, vmax=255)
     plt.show()
 
 #plot tree

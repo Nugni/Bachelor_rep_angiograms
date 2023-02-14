@@ -1,13 +1,57 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from TreeLib import Tree, drawTree, genTree
+#from TreeLib import Tree, drawTree, genTree
 import random as rnd
 
 #better idea; segment image. Make a mask. Then sample from either;
 #   1)inside mask for artery color.
 #   2) outside mask for background color
 
+#Add way to compute mean and std of arteries and background
+artery_mean = 70
+artery_std = 30
+backg_mean = 100
+backg_std = 30
+def get_artery_col():
+    guess = rnd.gauss(artery_mean, artery_std)
+    if guess < 0:
+        guess = 0
+    elif guess > 255:
+        guess = 255
+    return guess
+def get_backg_col():
+    guess = rnd.gauss(backg_mean, backg_std)
+    if guess < 0:
+        guess = 0
+    elif guess > 255:
+        guess = 255
+    return guess
+
+#Naive method of generating background and artery colors.
+#returns background and artery colors as tuple
+def gen_colors():
+    background_col = get_artery_col()
+    artery_col = get_backg_col()
+    #while background is somewhat darker or close to artery color find new
+    while (background_col < artery_col + 10):
+        background_col = get_artery_col()
+        artery_col = get_backg_col()
+    #handle under 255 and over 0.
+    return background_col, artery_col
+
+#works when label is 2D array of 1'es and 0'es.
+#outputs input represented as 2D float array between 0 and 1.
+def labelToInput(label):
+    arr = np.array(label.copy()).astype(float)
+    #Generate background and artery color. For now, done in naive manner.
+    back_col, art_col = gen_colors()
+    #replace artery and background (respectively) w.
+    arr[arr > 0] = art_col/255
+    arr[arr == 0] = back_col/255
+    return arr
+
+"""
 dim = 736
 #path to local data file
 pathDir = "../../../Orig_data/"
@@ -16,23 +60,6 @@ artery_im1 = pathDir + r"ImsegmentedPt_02 V_0/Orig/IMG00000_30.tiff"
 
 aim1 = cv2.imread(artery_im1, -1)
 
-#Add way to compute mean and std of arteries and background
-artery_mean = 70
-artery_std = rnd.gauss(artery_mean, 20)
-backg_mean = 100
-backg_std = rnd.gauss(backg_mean, 20)
-
-#Naive method of generating background and artery colors.
-#returns background and artery colors as tuple
-def gen_colors():
-    background_col = backg_mean + backg_std
-    artery_col = artery_mean + artery_std
-    #while background is somewhat darker or close to artery color find new
-    while (background_col < artery_col + 10):
-        background_col = backg_mean + backg_std
-        artery_col = artery_mean + artery_std
-    #handle under 255 and over 0.
-    return int(background_col), int(artery_col)
 
 #compute colors
 back_col, art_col = gen_colors()
@@ -41,20 +68,23 @@ print("background color: {0}, artery color: {1}".format(back_col, art_col))
 
 #make a tree. For now constants are hardcoded, this is to be generalized. 
 tree1 = Tree(0, 362, 15, 15, 0, 2)
+synLab = genTree(tree1, (736, 736))
+synInput = labelToInput(synLab)
+drawTree(synInput)
 #hack to ensure array is int arr not bool arr
-synTree = np.array(genTree(tree1, (736, 736))).astype(int)
+#synTree = np.array(genTree(tree1, (736, 736))).astype(int)
 
 #insert artery and background color
-synTree[synTree > 0] = art_col
-synTree[synTree == 0] = back_col
+#synTree[synTree > 0] = art_col
+#synTree[synTree == 0] = back_col
 #print(synTree)
 
 #draw input
-plt.imshow(synTree, cmap="gray", vmin=0, vmax=255)
-plt.show()
+#plt.imshow(synTree, cmap="gray", vmin=0, vmax=255)
+#plt.show()
 #draw label
-drawTree(tree1, ((736, 736)))
-
+#drawTree(tree1, ((736, 736)))
+"""
 
 #Abandoned:
 
