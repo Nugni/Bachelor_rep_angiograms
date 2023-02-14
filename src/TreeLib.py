@@ -98,7 +98,7 @@ def genTree(tree, dim):
 def drawTree(tree, dim):
     img = genTree(tree, dim) * 255
     plt.imshow(img,cmap="gray", vmin=0, vmax=255)
-    return img
+    plt.show()
 
 #plot tree
 #def drawTree(tree)
