@@ -8,25 +8,26 @@ import numpy as np
 
 #Synthetic angogram class: Node
 class Node:
-    def __init__(self, coord, width, length, angle, bifurcProb, bifurcBigLeft):
+    def __init__(self, coord, width, pLength, angle, bifurcProb, bifurcBigLeft, stdMul):
         self.coord = coord
         self.width = width
-        self.length = length
+        self.pLength = pLength
         self.angle = angle
+        self.stdMul = stdMul
         self.bifurcProb = bifurcProb
         self.bifurcBigLeft = bifurcBigLeft
         self.children = []
 
     #Creates a child node
-    def createChild(self, angle, ratio):
+    def createChild(self, angle, ratio):#, roadtravelled):
         newWidth = self.width*ratio
-        newLength = self.length*ratio
+        newLength = self.pLength*ratio#(self.pLength + roadtravelled)*ratio 
         curX = self.coord[0]
         curY = self.coord[1]
         newX = curX + math.cos(angle)*newLength
         newY = curY + math.sin(angle)*newLength
         newCoord = newX, newY
-        return Node(newCoord, newWidth, newLength, angle, self.bifurcProb, self.bifurcBigLeft)
+        return Node(newCoord, newWidth, newLength, angle, self.bifurcProb, self.bifurcBigLeft, self.stdMul)
 
     #Creates and add either 1 or 2 children to the parent node.
     def addChildren(self):
@@ -41,25 +42,26 @@ class Node:
                 (ratioL, ratioR), (angleL, angleR) = bmf.getAllParameters(alpha)
             else:
                 (ratioR, ratioL), (angleR, angleL) = bmf.getAllParameters(alpha)
-            leftChild = self.createChild(self.angle-angleL, ratioL)
+            leftChild = self.createChild(self.angle-angleL, ratioL)#, 0)
             self.children.append(leftChild)
-            rightChild = self.createChild(self.angle+angleR, ratioR)
+            rightChild = self.createChild(self.angle+angleR, ratioR)#, 0)
             self.children.append(rightChild)
         else:
             #Make 1 child following an angle
-            singleChild = self.createChild(self.angle, 1)
+            singleChild = self.createChild(random.gauss(self.angle, self.angle*self.stdMul), 1)#, self.pLength)
             self.children.append(singleChild)
 
 
 #Synthetic Angiogram class: Tree
 class Tree:
-    def __init__(self, x, y, width, length, angle, stopWidth, bifurcProb=0.3, bifurcBigLeft = 0.5):
+    def __init__(self, x, y, width, pLength, angle, stopWidth, bifurcProb=0.3, bifurcBigLeft = 0.5, angleStdMul = 0.0):
         self.stopWidth = stopWidth
-        self.addRoot(x,y, width, length, angle, bifurcProb, bifurcBigLeft)
+        self.angleStdMul = angleStdMul
+        self.addRoot(x,y, width, pLength, angle, bifurcProb, bifurcBigLeft)
         self.makeTree()
 
-    def addRoot(self, x, y, width, length, angle, bifurcProb, bifurcBigLeft):
-        self.root = Node((x,y), width, length, angle, bifurcProb, bifurcBigLeft)
+    def addRoot(self, x, y, width, pLength, angle, bifurcProb, bifurcBigLeft):
+        self.root = Node((x,y), width, pLength, angle, bifurcProb, bifurcBigLeft, self.angleStdMul)
     
     def growTree(self, node):
         if node.width < self.stopWidth:

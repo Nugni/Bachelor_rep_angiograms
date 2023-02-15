@@ -9,23 +9,27 @@ import random as rnd
 #   2) outside mask for background color
 
 #Add way to compute mean and std of arteries and background
-artery_mean = 70
+artery_mean = 50
 artery_std = 30
 backg_mean = 100
 backg_std = 30
+std_frac_noise = 0.3
+
+#Methods to generate background and artery colors.
 def get_artery_col():
     guess = rnd.gauss(artery_mean, artery_std)
     if guess < 0:
         guess = 0
-    elif guess > 255:
+    elif guess > 230:
         guess = 255
     return guess
+
 def get_backg_col():
     guess = rnd.gauss(backg_mean, backg_std)
     if guess < 0:
         guess = 0
-    elif guess > 255:
-        guess = 255
+    elif guess > 230:
+        guess = 230
     return guess
 
 #Naive method of generating background and artery colors.
@@ -37,7 +41,6 @@ def gen_colors():
     while (background_col < artery_col + 10):
         background_col = get_artery_col()
         artery_col = get_backg_col()
-    #handle under 255 and over 0.
     return background_col, artery_col
 
 #works when label is 2D array of 1'es and 0'es.
@@ -49,7 +52,14 @@ def labelToInput(label):
     #replace artery and background (respectively) w.
     arr[arr > 0] = art_col/255
     arr[arr == 0] = back_col/255
+    #add noise to arr
+    arr = addNoise(arr)
     return arr
+
+#Adds gaussian noise to a 2D numpy arr
+def addNoise(arr):
+    noise = np.random.normal(arr, std_frac_noise*arr)
+    return arr + noise
 
 """
 dim = 736

@@ -3,8 +3,9 @@ import math
 
 # Module for computing paramters for bifurcations
 # Math derived from the article in the link
-# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2229505/
 
+# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2229505/
+#Undersøg hvor 
 # In the following:
 # 0 is parent artery
 # 1 is biggest child artery
