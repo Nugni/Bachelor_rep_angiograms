@@ -98,9 +98,12 @@ def genTree(tree, dim):
     return img
 
 #generates and plots a 2D float arr (with values in [0, 1])
-def drawTree(arr):
+def drawTree(arr, lab=False):
     #img = genTree(tree, dim) * 255
-    plt.imshow(arr*255, cmap="gray", vmin=0, vmax=255)
+    if lab:
+        plt.imshow(arr*255, cmap="gray", vmin=0, vmax=255)
+    else:
+        plt.imshow(arr, cmap="gray", vmin=0, vmax=255)
     plt.show()
 
 #plot tree
