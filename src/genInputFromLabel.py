@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import cv2
+#import cv2
 #from TreeLib import Tree, drawTree, genTree
 import random as rnd
 
@@ -50,8 +50,8 @@ def labelToInput(label):
     #Generate background and artery color. For now, done in naive manner.
     back_col, art_col = gen_colors()
     #replace artery and background (respectively) w.
-    arr[arr > 0] = art_col/255
-    arr[arr == 0] = back_col/255
+    arr[arr > 0] = art_col#/255
+    arr[arr == 0] = back_col#/255
     #add noise to arr
     arr = addNoise(arr)
     return arr
