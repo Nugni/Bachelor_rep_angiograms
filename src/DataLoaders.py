@@ -10,12 +10,13 @@ import random
 
 #sets random state of transformations
 #ensures 2 different imgs may have same trans applied
-def perform_transform(img, seed, trans_dict):
-    #set random state
+def perform_transform(img, seed, trans_lst):
+    #set random state to ensure same random transformation is performed
     random.seed(seed)
     torch.manual_seed(seed)
-    trans_img = [trans(img) for trans in trans_dict]
-    return trans_img
+    for trans in trans_lst:
+        img = trans(img)
+    return img
 
 #Dataset class for synthetic data. Needs folder where synthetic data is.
 class SynData(torch.utils.data.Dataset):
@@ -23,30 +24,36 @@ class SynData(torch.utils.data.Dataset):
         #save transformations
         self.transforms_both = transforms_both
         self.transforms_train = transforms_train
+        self.data_dir = data_dir
+        self.lab_dir = label_dir
         #save placement of data and labels
-        self.get_data(data_dir, label_dir)
+        self.get_data()
 
-    def get_data(self, data_dir, label_dir):
-        files = os.listdir(data_dir)
+    def get_data(self):
+        files = os.listdir(self.data_dir)
         files.sort()
         self.data = files
-        files_lab = os.listdir(label_dir)
+        files_lab = os.listdir(self.lab_dir)
         files_lab.sort()
         self.labs = files_lab
         #if number of element
         if len(self.labs) != len(self.data):
             raise ValueError("Not given the same number of labels and data")
 
-    def __getitem__(self, index):
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
         #read data
-        path_data = os.path.join(self.data_dir, self.data[index])
-        data = ToTensor()(skimage.io.imread(path_data))
+        path_data = os.path.join(self.data_dir, self.data[idx])
+        data = ToTensor()(np.array(skimage.io.imread(path_data)))
         #read label
-        path_lab = os.path.join(self.lab_dir, self.lab[index])
+        path_lab = os.path.join(self.lab_dir, self.labs[idx])
         lab = ToTensor()(skimage.io.imread(path_lab))
 
         #seed for transformations
-        seed = np.random.randint(0, 2**32)
+        ii32 = np.iinfo(np.int32) #sample from as many ints as possible
+        seed = np.random.randint(0, ii32.max)
 
         #perform transformations
         if self.transforms_train is not None:
@@ -57,9 +64,6 @@ class SynData(torch.utils.data.Dataset):
 
         return data, lab
 
-    def __len__(self):
-        return len(self.data)
-    
 
 
 #Dataset class for action angio data
