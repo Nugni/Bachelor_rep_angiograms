@@ -9,9 +9,9 @@ import random as rnd
 #   2) outside mask for background color
 
 #Add way to compute mean and std of arteries and background
-artery_mean = 50
+artery_mean = 0
 artery_std = 30
-backg_mean = 100
+backg_mean = 200
 backg_std = 30
 std_frac_noise = 0.3
 
@@ -35,12 +35,14 @@ def get_backg_col():
 #Naive method of generating background and artery colors.
 #returns background and artery colors as tuple
 def gen_colors():
-    background_col = get_artery_col()
-    artery_col = get_backg_col()
+    background_col = get_backg_col()
+    artery_col = get_artery_col()
     #while background is somewhat darker or close to artery color find new
-    while (background_col < artery_col + 10):
-        background_col = get_artery_col()
-        artery_col = get_backg_col()
+    while (background_col < artery_col + 30):
+        background_col = get_backg_col()
+        artery_col = get_artery_col()
+    print("background.: {0}".format(background_col))
+    print("artery.: {0}".format(artery_col))
     return background_col, artery_col
 
 #works when label is 2D array of 1'es and 0'es.
@@ -50,16 +52,24 @@ def labelToInput(label):
     #Generate background and artery color. For now, done in naive manner.
     back_col, art_col = gen_colors()
     #replace artery and background (respectively) w.
-    arr[arr > 0] = art_col#/255
-    arr[arr == 0] = back_col#/255
+    #uses label as mask such that 0 and 1's are not overwritten
+    arr[label == 1] = art_col#/255
+    arr[label == 0] = back_col#/255
     #add noise to arr
     arr = addNoise(arr)
     return arr
 
 #Adds gaussian noise to a 2D numpy arr
 def addNoise(arr):
-    noise = np.random.normal(arr, std_frac_noise*arr)
-    return arr + noise
+    #generate arr w noise
+    noisy_arr = np.random.normal(arr, std_frac_noise*arr)
+    #noisy_arr = arr + noise
+    #ensures output stays within rgb borders (as input)
+    noisy_arr[noisy_arr > 255] = 255
+    noisy_arr[noisy_arr < 0] = 0
+    #makes arr discrete. Akin to actual data
+    ret_arr = np.array(noisy_arr).astype(int)
+    return noisy_arr
 
 """
 dim = 736
