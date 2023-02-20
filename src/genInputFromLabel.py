@@ -41,8 +41,6 @@ def gen_colors():
     while (background_col < artery_col + 30):
         background_col = get_backg_col()
         artery_col = get_artery_col()
-    print("background.: {0}".format(background_col))
-    print("artery.: {0}".format(artery_col))
     return background_col, artery_col
 
 #works when label is 2D array of 1'es and 0'es.
