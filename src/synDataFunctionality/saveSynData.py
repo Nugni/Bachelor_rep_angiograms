@@ -1,5 +1,5 @@
-from TreeLib import Tree, genTree
-from genInputFromLabel import labelToInput
+from synDataFunctionality.TreeLib import Tree, genTree
+from synDataFunctionality.genInputFromLabel import labelToInput
 import numpy as np
 import skimage.io
 import os

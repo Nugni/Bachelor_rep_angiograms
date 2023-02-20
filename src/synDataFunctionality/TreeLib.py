@@ -1,6 +1,6 @@
 import math
 import random
-import bifurcationMathFunctions as bmf
+import synDataFunctionality.bifurcationMathFunctions as bmf
 from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 import numpy as np

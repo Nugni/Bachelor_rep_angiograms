@@ -1,6 +1,6 @@
-from TreeLib import Tree
-from TreeLib import drawTree, genTree
-from genInputFromLabel import labelToInput
+from synDataFunctionality.TreeLib import Tree
+from synDataFunctionality.TreeLib import drawTree, genTree
+from synDataFunctionality.genInputFromLabel import labelToInput
 import torch
 import os
 import skimage.io
