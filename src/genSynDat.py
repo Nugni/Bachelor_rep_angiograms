@@ -11,4 +11,4 @@ def genSynDat(dir_name, tree_params_lst, data_dim, num_samples):
         skimage.io.imsave(dir_name +"lab_{0}.tiff".format(i), data)
 
 def readSynDat(dir_name):
-    
+    return
