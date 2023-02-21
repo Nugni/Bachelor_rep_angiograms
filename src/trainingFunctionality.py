@@ -25,18 +25,18 @@ def trainLoop(net, optimizer, criterion, device, epochs, train_loader, test_load
             optimizer.zero_grad()
 
             #forward + backward + optimize
-            outputs = net(inputs)
+            outputs = net(inputs.float()) #should fix double error
 
-            loss = criterion(input=outputs, target=labs)
+            loss = criterion(input=outputs.float(), target=labs.float()) #.float() should fix int error
             loss.backward()
             optimizer.step()
 
             #print statistics:
             run_train_loss = loss.item()
-            if i % print_interv == 9: #print every 10 minibatches
+            if i % print_interv == print_interv-1: #print every 10 minibatches
                 print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, run_train_loss / print_interv))
-                train_loss_lst.append()
+                train_loss_lst.append(run_train_loss / print_interv)
                 running_loss = 0.0
 
                 #compute some test error
@@ -45,9 +45,9 @@ def trainLoop(net, optimizer, criterion, device, epochs, train_loader, test_load
                 #move to device
                 test_input, test_lab = test_input.to(device), test_lab.to(device)
 
-                test_out = net(test_input)
+                test_out = net(test_input.float())
 
-                loss_test = criterion(input=test_out, target=test_lab)
+                loss_test = criterion(input=test_out.float(), target=test_lab.float())
                 run_test_loss = loss_test.item()
 
                 test_loss_lst.append(run_test_loss)
