@@ -40,7 +40,7 @@ def trainLoop(net, optimizer, criterion, device, epochs, train_loader, test_load
                 running_loss = 0.0
 
                 #compute some test error
-                test_input, test_lab = iter(test_loader).next()
+                test_input, test_lab = next(iter(test_loader))
 
                 #move to device
                 test_input, test_lab = test_input.to(device), test_lab.to(device)
@@ -52,8 +52,8 @@ def trainLoop(net, optimizer, criterion, device, epochs, train_loader, test_load
 
                 test_loss_lst.append(run_test_loss)
                 run_test_loss = 0.0
-        print("Finished training! :^)")
-        return train_loss_lst, test_loss_lst, net
+    print("Finished training! :^)")
+    return train_loss_lst, test_loss_lst, net
 
 
 #function to plot traing loss and possibly test loss after training
