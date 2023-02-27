@@ -58,13 +58,13 @@ def trainLoop(net, optimizer, criterion, device, epochs, train_loader, test_load
 
 #function to plot traing loss and possibly test loss after training
 def visualizeLoss(model_name, print_interv, train_lst, test_lst=None):
-    xTrain = (np.arange(len(train_lst))+1)*print_interv
+    xTrain = ((np.arange(len(train_lst))) + train_lst[0])*print_interv
     yTrain = train_lst
     plt.plot(xTrain, yTrain, label='Train loss')
 
     #Add test loss to plot if wished
     if test_lst is not None:
-        xTest = (np.arange(len(test_lst))+1)*print_interv
+        xTest = ((np.arange(len(test_lst))) + test_lst[0])*print_interv
         yTest = test_lst
         plt.plot(xTest, yTest, label='Test loss')
 
