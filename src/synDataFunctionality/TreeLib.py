@@ -17,7 +17,7 @@ def genNewLength(length, lengthRatioMean, lengthRatiostd):
     return newLen
 #Synthetic angogram class: Node
 class Node:
-    def __init__(self, coord, width, pLength, angle, bifurcProb, bifurcBigLeft, stdMul, lengthRatioMean, lengthRatiostd):
+    def __init__(self, coord, width, pLength, angle, bifurcProb, bifurcBigLeft, stdMul, lengthRatioMean, lengthRatiostd, roadtravelled=0):
         self.coord = coord
         self.width = width
         self.pLength = pLength
@@ -27,12 +27,13 @@ class Node:
         self.bifurcBigLeft = bifurcBigLeft
         self.lengthRatioMean = lengthRatioMean
         self.lengthRatiostd = lengthRatiostd
+        self.roadtravelled = roadtravelled
         self.children = []
 
     #Creates a child node
-    def createChild(self, angle, ratioWidth):#, roadtravelled):
+    def createChild(self, angle, ratioWidth):
         newWidth = self.width*ratioWidth
-        newLength = genNewLength(self.pLength, self.lengthRatioMean, self.lengthRatiostd)  #(self.pLength + roadtravelled)*ratio 
+        newLength = genNewLength(self.pLength + self.roadtravelled, self.lengthRatioMean, self.lengthRatiostd)
         curX = self.coord[0]
         curY = self.coord[1]
         newX = curX + math.cos(angle)*newLength
@@ -53,16 +54,17 @@ class Node:
                 (ratioL, ratioR), (angleL, angleR) = bmf.getAllParameters(alpha)
             else:
                 (ratioR, ratioL), (angleR, angleL) = bmf.getAllParameters(alpha)
-            leftChild = self.createChild(self.angle-angleL, ratioL)#, 0)
+            leftChild = self.createChild(self.angle-angleL, ratioL)
             self.children.append(leftChild)
-            rightChild = self.createChild(self.angle+angleR, ratioR)#, 0)
+            rightChild = self.createChild(self.angle+angleR, ratioR)
             self.children.append(rightChild)
         else:
             #Make 1 child following an angle
             singleChild = self.createChild(
                 random.gauss(self.angle, self.angle*self.stdMul),
                 0.98
-                )#, self.pLength)
+                )
+            self.roadtravelled += self.pLength
             self.children.append(singleChild)
 
 
@@ -96,8 +98,11 @@ def drawNode(node, draw):
     if len(node.children) >= 1:
         px, py = int(node.coord[0]), int(node.coord[1])
         for child in node.children:
-            cx, cy = int(child.coord[0]), int(child.coord[1])
-            draw.line((px, py, cx, cy), fill = 1, width=int(child.width))
+            cx, cy = int(child.coord[0]), int(child.coord[1])           #ensure curved lines
+            draw.line((px, py, cx, cy), fill = 1, width=int(child.width), joint='curve')
+            #ensures bendy lines, and not 'crackled' lines
+            Offset = (int(child.width)-1)/2
+            draw.ellipse ((cx-Offset, cy-Offset, cx+Offset, cy+Offset), fill=1)
             drawNode(child, draw)
     else:
         return
