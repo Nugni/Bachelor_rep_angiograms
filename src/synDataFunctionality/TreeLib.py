@@ -12,12 +12,14 @@ def genNewLength(length, lengthRatioMean, lengthRatiostd):
     newLen = ratio*length
     if newLen < 10: #The lengths do not become smaller than 10
         newLen = 10
+    if newLen > 80:
+        newLen = 80
     #print("ratio {0}, length {1}".format(ratio, length))
     #print(ratio*length)
     return newLen
 #Synthetic angogram class: Node
 class Node:
-    def __init__(self, coord, width, pLength, angle, bifurcProb, bifurcBigLeft, stdMul, lengthRatioMean, lengthRatiostd, roadtravelled=0):
+    def __init__(self, coord, width, pLength, angle, bifurcProb, bifurcBigLeft, stdMul, lengthRatioMean, lengthRatiostd):
         self.coord = coord
         self.width = width
         self.pLength = pLength
@@ -27,13 +29,12 @@ class Node:
         self.bifurcBigLeft = bifurcBigLeft
         self.lengthRatioMean = lengthRatioMean
         self.lengthRatiostd = lengthRatiostd
-        self.roadtravelled = roadtravelled
         self.children = []
 
     #Creates a child node
     def createChild(self, angle, ratioWidth):
-        newWidth = self.width*ratioWidth
-        newLength = genNewLength(self.pLength + self.roadtravelled, self.lengthRatioMean, self.lengthRatiostd)
+        newWidth = self.width*ratioWidth #Know, right now we draw things smaller than stopWidth. 
+        newLength = genNewLength(self.pLength , self.lengthRatioMean, self.lengthRatiostd) #Change for when we have a bifurc
         curX = self.coord[0]
         curY = self.coord[1]
         newX = curX + math.cos(angle)*newLength
@@ -42,7 +43,7 @@ class Node:
         return Node(newCoord, newWidth, newLength, angle, self.bifurcProb, self.bifurcBigLeft, self.stdMul, self.lengthRatioMean, self.lengthRatiostd)
 
     #Creates and add either 1 or 2 children to the parent node.
-    def addChildren(self):
+    def addChildren(self, stopWidth):
         bifurcation = (random.random() < self.bifurcProb)
         if bifurcation:
             # alpha is the ratio between diameters small/big
@@ -64,7 +65,6 @@ class Node:
                 random.gauss(self.angle, self.angle*self.stdMul),
                 0.98
                 )
-            self.roadtravelled += self.pLength
             self.children.append(singleChild)
 
 
@@ -78,15 +78,15 @@ class Tree:
 
     def addRoot(self, x, y, width, pLength, angle, bifurcProb, bifurcBigLeft, lengthRatioMean, lengthRatiostd):
         self.root = Node((x,y), width, pLength, angle, bifurcProb, bifurcBigLeft, self.angleStdMul, lengthRatioMean, lengthRatiostd)
-    
+
     def growTree(self, node):
         if node.width < self.stopWidth:
             return
         else:
-            node.addChildren()
+            node.addChildren(self.stopWidth)
             for child in node.children:
                 self.growTree(child)
-    
+
     def makeTree(self):
         self.growTree(self.root)
         
@@ -101,7 +101,7 @@ def drawNode(node, draw):
             cx, cy = int(child.coord[0]), int(child.coord[1])           #ensure curved lines
             draw.line((px, py, cx, cy), fill = 1, width=int(child.width), joint='curve')
             #ensures bendy lines, and not 'crackled' lines
-            Offset = (int(child.width)-1)/2
+            Offset = (int(child.width)-1)/2 - 1
             draw.ellipse ((cx-Offset, cy-Offset, cx+Offset, cy+Offset), fill=1)
             drawNode(child, draw)
     else:

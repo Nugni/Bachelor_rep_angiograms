@@ -33,3 +33,7 @@ Interesting python
 	Turtle
 	PyTorch
 		
+
+Theory:
+	https://d2l.ai/d2l-en.pdf
+		Brug til ViT
