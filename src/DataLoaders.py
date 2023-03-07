@@ -20,12 +20,13 @@ def perform_transform(img, seed, trans_lst):
 
 #Dataset class for synthetic data. Needs folder where synthetic data is.
 class SynData(torch.utils.data.Dataset):
-    def __init__(self, data_dir, label_dir, transforms_both = None, transforms_train = None):
+    def __init__(self, data_dir, label_dir, repeat_channels=False, transforms_both = None, transforms_train = None):
         #save transformations
         self.transforms_both = transforms_both
         self.transforms_train = transforms_train
         self.data_dir = data_dir
         self.lab_dir = label_dir
+        self.repeat_channels = repeat_channels
         #save placement of data and labels
         self.get_data()
 
@@ -61,6 +62,9 @@ class SynData(torch.utils.data.Dataset):
         if self.transforms_both is not None:
             data = perform_transform(data, seed, self.transforms_both)
             lab = perform_transform(lab, seed, self.transforms_both)
+
+        if self.repeat_channels:
+            data = torch.repeat_interleave(data[:, :, :], 3, axis=0)
 
         return data, lab
 
