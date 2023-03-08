@@ -32,7 +32,8 @@ Interesting sites:
 Interesting python
 	Turtle
 	PyTorch
-		
+	https://github.com/open-mmlab/mmsegmentation/tree/v0.21.0
+		pytorch semantic segmentation toolbox
 
 Theory:
 	https://d2l.ai/d2l-en.pdf
