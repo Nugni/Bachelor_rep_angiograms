@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.ndimage import gaussian_filter
+
 #import cv2
 #from TreeLib import Tree, drawTree, genTree
 import random as rnd
@@ -12,6 +14,7 @@ import random as rnd
 artery_mean = 0
 artery_std = 30
 backg_mean = 200
+std_gauss_filter = 2.4
 backg_std = 30
 std_frac_noise = 0.3
 
@@ -47,12 +50,19 @@ def gen_colors():
 #outputs input represented as 2D float array between 0 and 1.
 def labelToInput(label):
     arr = np.array(label.copy()).astype(float)
+
     #Generate background and artery color. For now, done in naive manner.
     back_col, art_col = gen_colors()
-    #replace artery and background (respectively) w.
     #uses label as mask such that 0 and 1's are not overwritten
     arr[label == 1] = art_col#/255
     arr[label == 0] = back_col#/255
+
+    #add mask to arr to simulate blobs and lines
+    arr = addMask(arr)
+
+    #add blur to arr
+    arr = addBlur(arr, std_gauss_filter)
+
     #add noise to arr
     arr = addNoise(arr)
     return arr
@@ -68,6 +78,13 @@ def addNoise(arr):
     #makes arr discrete. Akin to actual data
     ret_arr = np.array(noisy_arr).astype(int)
     return noisy_arr
+
+def addMask(arr):
+    return arr
+
+def addBlur(img, std):
+    blurred_img = gaussian_filter(img, std)
+    return blurred_img
 
 """
 dim = 736
