@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
+from scipy.stats import poisson
 
 #import cv2
 #from TreeLib import Tree, drawTree, genTree
@@ -17,6 +18,7 @@ backg_mean = 200
 std_gauss_filter = 2.4
 backg_std = 30
 std_frac_noise = 0.3
+lambdaPois = 21
 
 #Methods to generate background and artery colors.
 def get_artery_col():
@@ -67,17 +69,6 @@ def labelToInput(label):
     arr = addNoise(arr)
     return arr
 
-#Adds gaussian noise to a 2D numpy arr
-def addNoise(arr):
-    #generate arr w noise
-    noisy_arr = np.random.normal(arr, std_frac_noise*arr)
-    #noisy_arr = arr + noise
-    #ensures output stays within rgb borders (as input)
-    noisy_arr[noisy_arr > 255] = 255
-    noisy_arr[noisy_arr < 0] = 0
-    #makes arr discrete. Akin to actual data
-    ret_arr = np.array(noisy_arr).astype(int)
-    return noisy_arr
 
 def addMask(arr):
     return arr
@@ -85,6 +76,21 @@ def addMask(arr):
 def addBlur(img, std):
     blurred_img = gaussian_filter(img, std)
     return blurred_img
+
+#Adds gaussian noise to a 2D numpy arr
+def addNoise(arr):
+    dimX, dimY = len(arr)
+    #generate arr w noise
+    noise_array = poisson.rvs(lambdaPois,size=dimX*dimY)
+    noise_mask = np.reshape(noise_array,(dimX,dimY))
+    noisy_arr = arr + noise_mask
+    #noisy_arr = arr + noise
+    #ensures output stays within rgb borders (as input)
+    noisy_arr[noisy_arr > 255] = 255
+    noisy_arr[noisy_arr < 0] = 0
+    #makes arr discrete. Akin to actual data
+    #ret_arr = np.array(noisy_arr).astype(int)
+    return noisy_arr
 
 """
 dim = 736
