@@ -12,12 +12,11 @@ import random as rnd
 #   2) outside mask for background color
 
 #Add way to compute mean and std of arteries and background
-artery_mean = 0
-artery_std = 30
-backg_mean = 200
+artery_mean = 30
+artery_std = 6
+backg_mean = 118
+backg_std = 7
 std_gauss_filter = 2.4
-backg_std = 30
-std_frac_noise = 0.3
 lambdaPois = 21
 
 #Methods to generate background and artery colors.
@@ -79,10 +78,10 @@ def addBlur(img, std):
 
 #Adds gaussian noise to a 2D numpy arr
 def addNoise(arr):
-    dimX, dimY = len(arr)
+    dimX = len(arr[0])
     #generate arr w noise
-    noise_array = poisson.rvs(lambdaPois,size=dimX*dimY)
-    noise_mask = np.reshape(noise_array,(dimX,dimY))
+    noise_array = poisson.rvs(lambdaPois,size=dimX*dimX)
+    noise_mask = np.reshape(noise_array,(dimX,dimX))
     noisy_arr = arr + noise_mask
     #noisy_arr = arr + noise
     #ensures output stays within rgb borders (as input)

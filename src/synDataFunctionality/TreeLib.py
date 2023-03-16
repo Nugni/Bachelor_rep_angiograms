@@ -56,16 +56,21 @@ class Node:
             else:
                 (ratioR, ratioL), (angleR, angleL) = bmf.getAllParameters(alpha)
             leftChild = self.createChild(self.angle-angleL, ratioL)
-            self.children.append(leftChild)
+            #If children is too narrow to be 'seen' we assume the bifurcation has still happened
+            #We simply cannot see it.
+            if leftChild.width >= stopWidth:
+                self.children.append(leftChild)
             rightChild = self.createChild(self.angle+angleR, ratioR)
-            self.children.append(rightChild)
+            if rightChild.width >= stopWidth:
+                self.children.append(rightChild)
         else:
             #Make 1 child following an angle
             singleChild = self.createChild(
                 random.gauss(self.angle, self.angle*self.stdMul),
                 0.98
                 )
-            self.children.append(singleChild)
+            if singleChild.width >= stopWidth:
+                self.children.append(singleChild)
 
 
 #Synthetic Angiogram class: Tree
@@ -98,10 +103,12 @@ def drawNode(node, draw):
     if len(node.children) >= 1:
         px, py = int(node.coord[0]), int(node.coord[1])
         for child in node.children:
+            if round(child.width) <= 2:
+                print(child.width)
             cx, cy = int(child.coord[0]), int(child.coord[1])           #ensure curved lines
-            draw.line((px, py, cx, cy), fill = 1, width=int(child.width), joint='curve')
+            draw.line((px, py, cx, cy), fill = 1, width=round(child.width), joint='curve')
             #ensures bendy lines, and not 'crackled' lines
-            Offset = (int(child.width)-1)/2 - 1
+            Offset = (round(child.width)-1)/2 - 1
             draw.ellipse ((cx-Offset, cy-Offset, cx+Offset, cy+Offset), fill=1)
             drawNode(child, draw)
     else:
