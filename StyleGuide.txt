@@ -1,0 +1,5 @@
+Style guide
+
+Klasser i PascalCase og funktioner i camelCase
+
+metoder og variable i snake_case
