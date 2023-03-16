@@ -94,7 +94,7 @@ class Tree:
 
     def makeTree(self):
         self.growTree(self.root)
-        
+
 
 def nodeInside(cx, cy, X, Y):
     return (cx < X and cx >= 0 and cy < Y and cy >= 0)
@@ -103,8 +103,6 @@ def drawNode(node, draw):
     if len(node.children) >= 1:
         px, py = int(node.coord[0]), int(node.coord[1])
         for child in node.children:
-            if round(child.width) <= 2:
-                print(child.width)
             cx, cy = int(child.coord[0]), int(child.coord[1])           #ensure curved lines
             draw.line((px, py, cx, cy), fill = 1, width=round(child.width), joint='curve')
             #ensures bendy lines, and not 'crackled' lines
