@@ -1,17 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import random as rnd
 from scipy.ndimage import gaussian_filter
 from scipy.stats import poisson
-
-#import cv2
-#from TreeLib import Tree, drawTree, genTree
-import random as rnd
 
 #better idea; segment image. Make a mask. Then sample from either;
 #   1)inside mask for artery color.
 #   2) outside mask for background color
 
-#Add way to compute mean and std of arteries and background
+# Add way to compute mean and std of arteries and background
 artery_mean = 30
 artery_std = 6
 backg_mean = 118
@@ -19,7 +16,7 @@ backg_std = 7
 std_gauss_filter = 2.4
 lambdaPois = 21
 
-#Methods to generate background and artery colors.
+# Methods to generate background and artery colors.
 def get_artery_col():
     guess = rnd.gauss(artery_mean, artery_std)
     if guess < 0:
@@ -36,8 +33,8 @@ def get_backg_col():
         guess = 230
     return guess
 
-#Naive method of generating background and artery colors.
-#returns background and artery colors as tuple
+# Naive method of generating background and artery colors.
+# returns background and artery colors as tuple
 def gen_colors():
     background_col = get_backg_col()
     artery_col = get_artery_col()
