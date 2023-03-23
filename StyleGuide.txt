@@ -3,3 +3,7 @@ Style guide
 Klasser i PascalCase og funktioner i camelCase
 
 metoder og variable i snake_case
+
+Mellemrum imellem kommentar-tegn og kommentar:
+	Forkert: #Comment
+	Korrekt: # Comment

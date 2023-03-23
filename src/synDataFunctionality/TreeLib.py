@@ -1,128 +1,152 @@
 import math
 import random
-import synDataFunctionality.bifurcationMathFunctions as bmf
-from PIL import Image, ImageDraw
+from sklearn.mixture import GaussianMixture
+import SynDataFunctionality.bifurcationMathFunctions as bmf
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image, ImageDraw
 
-def genNewLength(length, lengthRatioMean, lengthRatiostd):
-    ratio = np.random.normal(lengthRatioMean, lengthRatiostd)
-    while ratio < 0.3: #blood vessels do not really become smaller than this
-        ratio = np.random.normal(lengthRatioMean, lengthRatiostd)
-    newLen = ratio*length
-    if newLen < 10: #The lengths do not become smaller than 10
-        newLen = 10
-    if newLen > 80:
-        newLen = 80
-    #print("ratio {0}, length {1}".format(ratio, length))
-    #print(ratio*length)
-    return newLen
+bifurc_cdf = [0, 0.17819338490705852, 0.4948775648691266, 0.796706906909377, 0.9509823643337217, 0.9932718619501374, 0.9994886850041991, 0.9999788076670704, 0.9999995301294428, 1]
+bifurc_angle_model = GaussianMixture(2)
+bifurc_angle_model.means_ = np.array([[-46.68106076], [ 38.07296841]])
+bifurc_angle_model.weights_ = np.array([0.4882134, 0.5117866])
+bifurc_angle_model.covariances_ = np.array([[[569.53799684]], [[974.55896059]]])
+bifurc_angle_model.prec = np.array([[[0.00175581]], [[0.00102611]]])
+
+
+def gen_new_length(width, length_ratio_mean, length_ratio_std): #, smallest_next_length_ratio):
+    # Get ratio between current and next length
+    next_length_ratio = np.random.normal(0.10354471, 0.15610471) #length_ratio_mean, length_ratio_std)
+    while next_length_ratio < 0.3: # smallest_next_length_ratio:
+        next_length_ratio = np.random.normal(0.10354471, 0.15610471) #length_ratio_mean, length_ratio_std)
+    new_length = width / next_length_ratio
+
+    # constricting length: 10 < length < 80
+    if new_length < 10:
+        new_length = 10
+    if new_length > 80:
+        new_length = 80
+
+    return new_length
+
+
 #Synthetic angogram class: Node
 class Node:
-    def __init__(self, coord, width, pLength, angle, bifurcProb, bifurcBigLeft, stdMul, lengthRatioMean, lengthRatiostd):
+    def __init__(self, coord, width,
+                 prev_length, angle,
+                 bifurc_prob, bifurc_big_left,
+                 stdMul,
+                 length_ratio_mean, length_ratio_std,
+                 counter,
+                 single_child_width_ratio = 0.98):
         self.coord = coord
         self.width = width
-        self.pLength = pLength
+        self.prev_length = prev_length
         self.angle = angle
+        self.bifurc_prob = bifurc_prob
+        self.bifurc_big_left = bifurc_big_left
         self.stdMul = stdMul
-        self.bifurcProb = bifurcProb
-        self.bifurcBigLeft = bifurcBigLeft
-        self.lengthRatioMean = lengthRatioMean
-        self.lengthRatiostd = lengthRatiostd
+        self.length_ratio_mean = length_ratio_mean
+        self.length_ratio_std = length_ratio_std
+        self.single_child_width_ratio = single_child_width_ratio
+        self.counter = counter
         self.children = []
 
-    #Creates a child node
-    def createChild(self, angle, ratioWidth):
-        newWidth = self.width*ratioWidth #Know, right now we draw things smaller than stopWidth. 
-        newLength = genNewLength(self.pLength , self.lengthRatioMean, self.lengthRatiostd) #Change for when we have a bifurc
-        curX = self.coord[0]
-        curY = self.coord[1]
-        newX = curX + math.cos(angle)*newLength
-        newY = curY + math.sin(angle)*newLength
-        newCoord = newX, newY
-        return Node(newCoord, newWidth, newLength, angle, self.bifurcProb, self.bifurcBigLeft, self.stdMul, self.lengthRatioMean, self.lengthRatiostd)
+    # Create a child node
+    def create_child(self, angle, ratio_width, counter):
+        # Find new width
+        new_width = self.width*ratio_width
+        # Find new coordinates
+        new_length = gen_new_length(new_width , self.length_ratio_mean, self.length_ratio_std)
+        cur_x, cur_y = self.coord
+        new_x, new_y = cur_x + math.cos(angle)*new_length, cur_y + math.sin(angle)*new_length
 
-    #Creates and add either 1 or 2 children to the parent node.
-    def addChildren(self, stopWidth):
-        bifurcation = (random.random() < self.bifurcProb)
+        return Node((new_x,new_y), new_width, new_length, angle, self.bifurc_prob, self.bifurc_big_left, self.stdMul, self.length_ratio_mean, self.length_ratio_std, counter)
+
+    # Creates and add either 1 or 2 children to the parent node
+    def add_children(self, stop_width):
+        # Bifurcation should happen with a certain possibility
+        bifurcation = (random.random() < bifurc_cdf[self.counter]) # bifurc_prob)
         if bifurcation:
-            # alpha is the ratio between diameters small/big
-            alpha = bmf.getRandomAlpha()
-            # Make 2 children mirrored across an angle
-            # getAllParameters returns (bigParams, smallParams).
-            # The bifurcBigLeft randomises direction of biggest new artery
-            if self.bifurcBigLeft < random.random():
-                (ratioL, ratioR), (angleL, angleR) = bmf.getAllParameters(alpha)
+            # Get ratio between artery diameters: 0 < small/big <= 1
+            alpha = bmf.get_random_alpha()
+
+            # bifurc_big_left randomizes direction of biggest artery
+            if self.bifurc_big_left < random.random():
+                (ratio_l, ratio_r), (angle_l, angle_r) = bmf.get_all_parameters(alpha)
             else:
-                (ratioR, ratioL), (angleR, angleL) = bmf.getAllParameters(alpha)
-            leftChild = self.createChild(self.angle-angleL, ratioL)
-            #If children is too narrow to be 'seen' we assume the bifurcation has still happened
-            #We simply cannot see it.
-            if leftChild.width >= stopWidth:
+                (ratio_r, ratio_l), (angle_r, angle_l) = bmf.get_all_parameters(alpha)
+
+            # Make children bifurcating at an angle
+            leftChild = self.create_child(self.angle-angle_l, ratio_l, 1)
+            rightChild = self.create_child(self.angle+angle_r, ratio_r, 1)
+
+            # Ensures too narrow children are not drawn
+            if leftChild.width >= stop_width:
                 self.children.append(leftChild)
-            rightChild = self.createChild(self.angle+angleR, ratioR)
-            if rightChild.width >= stopWidth:
+            if rightChild.width >= stop_width:
                 self.children.append(rightChild)
+
         else:
-            #Make 1 child following an angle
-            singleChild = self.createChild(
-                random.gauss(self.angle, self.angle*self.stdMul),
-                0.98
-                )
-            if singleChild.width >= stopWidth:
-                self.children.append(singleChild)
+            # Make 1 child following an angle
+            single_child = self.create_child(
+                self.angle + np.random.normal(0,50)/360*2*math.pi,
+                self.single_child_width_ratio, self.counter+1)
+            # Ensures too narrow children are not drawn
+            if single_child.width >= stop_width:
+                self.children.append(single_child)
 
 
 #Synthetic Angiogram class: Tree
 class Tree:
-    def __init__(self, x, y, width, pLength, angle, stopWidth, angleStdMul = 0.0, bifurcProb=0.3, bifurcBigLeft = 0.5, lengthRatioMean = 0.95, lengthRatiostd=0.43):
-        self.stopWidth = stopWidth
-        self.angleStdMul = angleStdMul
-        self.addRoot(x,y, width, pLength, angle, bifurcProb, bifurcBigLeft, lengthRatioMean, lengthRatiostd)
-        self.makeTree()
+    def __init__(self, x, y, width, prev_length, angle, stop_width, angle_std_mul = 0.0, bifurc_prob=0.3, bifurc_big_left = 0.5, length_ratio_mean = 0.95, length_ratio_std=0.43):
+        self.stop_width = stop_width
+        self.angle_std_mul = angle_std_mul
+        self.add_root(x,y, width, prev_length, angle, bifurc_prob, bifurc_big_left, length_ratio_mean, length_ratio_std)
+        self.make_tree()
 
-    def addRoot(self, x, y, width, pLength, angle, bifurcProb, bifurcBigLeft, lengthRatioMean, lengthRatiostd):
-        self.root = Node((x,y), width, pLength, angle, bifurcProb, bifurcBigLeft, self.angleStdMul, lengthRatioMean, lengthRatiostd)
+    def add_root(self, x, y, width, prev_length, angle, bifurc_prob, bifurc_big_left, length_ratio_mean, length_ratio_std):
+        self.root = Node((x,y), width, prev_length, angle, bifurc_prob, bifurc_big_left, self.angle_std_mul, length_ratio_mean, length_ratio_std, 1)
 
-    def growTree(self, node):
-        if node.width < self.stopWidth:
+    def grow_tree(self, node):
+        if node.width < self.stop_width:
             return
         else:
-            node.addChildren(self.stopWidth)
+            node.add_children(self.stop_width)
             for child in node.children:
-                self.growTree(child)
+                self.grow_tree(child)
 
-    def makeTree(self):
-        self.growTree(self.root)
+    def make_tree(self):
+        self.grow_tree(self.root)
 
 
-def nodeInside(cx, cy, X, Y):
+def node_inside(cx, cy, X, Y):
     return (cx < X and cx >= 0 and cy < Y and cy >= 0)
 
-def drawNode(node, draw):
+def draw_node(node, draw):
     if len(node.children) >= 1:
-        px, py = int(node.coord[0]), int(node.coord[1])
+        parent_x, parent_y = int(node.coord[0]), int(node.coord[1])
         for child in node.children:
-            cx, cy = int(child.coord[0]), int(child.coord[1])           #ensure curved lines
-            draw.line((px, py, cx, cy), fill = 1, width=round(child.width), joint='curve')
+            child_x, child_y = int(child.coord[0]), int(child.coord[1])
+            draw.line((parent_x, parent_y, child_x, child_y), fill = 1, width=round(child.width), joint='curve')
             #ensures bendy lines, and not 'crackled' lines
-            Offset = (round(child.width)-1)/2 - 1
-            draw.ellipse ((cx-Offset, cy-Offset, cx+Offset, cy+Offset), fill=1)
-            drawNode(child, draw)
+            offset = (round(child.width)-1)/2 - 1
+            draw.ellipse ((child_x-offset, child_y-offset, child_x+offset, child_y+offset), fill=1)
+            draw_node(child, draw)
     else:
         return
 
 
 #Generates the tree as a 2D numpy array
-def genTree(tree, dim):
+def gen_tree(tree, dim):
     img = Image.new("1", dim)
     draw = ImageDraw.Draw(img)
-    drawNode(tree.root, draw)
+    draw_node(tree.root, draw)
     img = np.array(img)
     return img
 
-#generates and plots a 2D float arr (with values in [0, 1])
-def drawTree(arr, lab=False):
+# generates and plots a 2D float arr (with values in [0, 1])
+def draw_tree(arr, lab=False):
     #img = genTree(tree, dim) * 255
     if lab:
         plt.imshow(arr*255, cmap="gray", vmin=0, vmax=255)
