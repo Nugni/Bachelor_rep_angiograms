@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-#NOT TESTED
+from sklearn.metrics import f1_score
+import torchvision.utils
 
 #Function that given relevant parameters perform a training loop of some net
 #returns 2 lists of training and val loss for plotting loss as a function
@@ -74,3 +75,36 @@ def visualizeLoss(model_name, print_interv, train_lst, val_lst=None):
     plt.title("Loss of {0} over number of iterations".format(model_name))
     plt.legend() #should plot which graph is which
     plt.show()
+
+
+
+
+# method for testing net
+# Check if works with batches
+def test_net(net, testLoader, device, illustrate=False):
+    testIter = iter(testLoader)
+    acum_score = 0
+    for i in range(len(testIter)):
+        test_input, test_lab_orig = next(testIter)
+        #predict
+        test_input, test_lab = test_input.to(device), test_lab_orig.to(device)
+        #detach from device
+        test_out = (net(test_input.float())).cpu().detach() #put output back on cpu
+        #formatér
+        orig_lab = test_lab_orig.numpy()[0]
+        pred_lab = np.array(test_out.numpy()[0] > 0.5).astype(int)
+        #compute f1 score
+        score = f1_score(orig_lab[0], pred_lab[0], average="micro")
+        acum_score += score
+
+        if illustrate:
+            print("actual label:")
+            plt.imshow(torchvision.utils.make_grid(test_lab_orig).numpy()[0], cmap="gray", vmin=0, vmax=1)
+            plt.show()
+            print("predicted lab:")
+            plt.imshow(torchvision.utils.make_grid(test_out).numpy()[0] > 0.5, cmap="gray", vmin=0, vmax=1)
+            plt.show()
+        #print f1 score
+        print("f1 score: {0:.5f}".format(score))
+        print()
+    print("Mean f1 score: {0:.5f}".format(acum_score/len(testLoader)))
