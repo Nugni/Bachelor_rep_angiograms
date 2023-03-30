@@ -68,6 +68,37 @@ class SynData(torch.utils.data.Dataset):
 
         return data, lab
 
+#change color of background
+def change_bckg_col(img):
+    return img
+
+
+#Data set which given backgrounds (no arteries) adjustments are made to images such that new backgrounds can be made
+class BackgroundData(torch.utils.data.Dataset):
+    def __init__(self, backg_dir, transforms=None, repeat_channels=False):
+        self.transforms = transforms
+        self.repeat_channels = repeat_channels
+        #save placement of backgrounds
+        self.backg_dir = backg_dir
+        self.files = os.listdir(backg_dir)
+
+    def __getitem__(self, idx):
+        path_data = os.path.join(self.backg_dir, self.files[idx])
+        data = ToTensor()(np.array(skimage.io.imread(path_data)))
+
+        data = change_bckg_col(data)
+
+        if self.transforms is not None:
+            for trans in self.transforms:
+                data = trans(data)
+
+        if self.repeat_channels:
+            data = torch.repeat_interleave(data[:, :, :], 3, axis=0)
+
+        return data
+
+    def __len__(self):
+        return len(self.files)
 
 
 #Dataset class for action angio data

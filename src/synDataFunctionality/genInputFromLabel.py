@@ -4,7 +4,7 @@ import random as rnd
 from scipy.ndimage import gaussian_filter
 from scipy.stats import poisson
 
-#better idea; segment image. Make a mask. Then sample from either;
+# better idea; segment image. Make a mask. Then sample from either;
 #   1)inside mask for artery color.
 #   2) outside mask for background color
 
@@ -14,7 +14,7 @@ artery_std = 6
 backg_mean = 118
 backg_std = 7
 std_gauss_filter = 2.4
-lambdaPois = 21
+noise_var = 21
 
 # Methods to generate background and artery colors.
 def get_artery_col():
@@ -44,30 +44,56 @@ def gen_colors():
         artery_col = get_artery_col()
     return background_col, artery_col
 
-#works when label is 2D array of 1'es and 0'es.
-#outputs input represented as 2D float array between 0 and 1.
-def labelToInput(label):
+def scale_img(arr):
+    return arr/(np.max(arr)/1)
+
+
+def gen_noise_map(arr, noise_std, noise_mu):
+    dimX, dimY = len(arr), len(arr[0])
+    #noise_map = np.zeros((dimX, dimY))
+    noise_mask = np.random.normal(noise_mu, noise_std, (dimX, dimY))
+    for i in range(dimX):
+        for j in range(dimY):
+            noise_mask[i, j] = arr[i, j]*noise_mask[i, j]
+    return noise_mask
+
+def scale_blur_art(arr, std_filter):
+    blurred_art = gaussian_filter(np.array(arr, dtype="float"), std_filter)
+    scaled_blur_art = scale_img(blurred_art)
+    return scaled_blur_art
+
+def put_together(bg, mult_map, noise_map, art_col):
+    dimX, dimY = len(bg), len(bg[0])
+    ret_img = np.zeros((dimX, dimY))
+    for i in range(dimX):
+        for j in range(dimY):
+            ret_img[i, j] = bg[i, j] * (1-mult_map[i, j]) + (art_col*mult_map[i, j] + noise_map[i, j])
+
+    #Ensure it is int array
+    ret_img = np.array(ret_img, dtype="int32")
+    return ret_img
+
+# works when label is 2D array of 1'es and 0'es.
+# outputs input represented as 2D float array between 0 and 1.
+# Backgrounds should be a dataset
+def labelToInput(label, background):
     arr = np.array(label.copy()).astype(float)
-
-    #Generate background and artery color. For now, done in naive manner.
+    # Generate background and artery color. For now, done in naive manner.
     back_col, art_col = gen_colors()
-    #uses label as mask such that 0 and 1's are not overwritten
-    arr[label == 1] = art_col#/255
-    arr[label == 0] = back_col#/255
+    # apply blur scaled to 0-1
+    scaled_blur_art = scale_blur_art(arr, std_gauss_filter)
 
-    #add mask to arr to simulate blobs and lines
-    arr = addMask(arr)
+    # gen noise_map
+    noise_map = gen_noise_map(scaled_blur_art, np.sqrt(noise_var), 0)
 
-    #add blur to arr
-    arr = addBlur(arr, std_gauss_filter)
+    # do something
+    background = background
 
-    #add noise to arr
-    arr = addNoise(arr)
-    return arr
+    img = put_together(background, scaled_blur_art, noise_map, art_col)
 
+    return img
 
-def addMask(arr):
-    return arr
+"""
 
 def addBlur(img, std):
     blurred_img = gaussian_filter(img, std)
@@ -87,6 +113,8 @@ def addNoise(arr):
     #makes arr discrete. Akin to actual data
     #ret_arr = np.array(noisy_arr).astype(int)
     return noisy_arr
+
+"""
 
 """
 dim = 736
