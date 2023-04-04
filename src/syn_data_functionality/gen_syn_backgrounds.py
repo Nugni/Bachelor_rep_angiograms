@@ -46,13 +46,15 @@ def img_to_background(image, label, kernel_dim):
 def make_backgrounds(img_dir, label_dir, save_dir, files_prefix, kernel_dim=8):
     files = os.listdir(img_dir)
     files.sort()
+    file_paths = [img_dir + "\\" + str(file) for file in files]
     labels = os.listdir(label_dir)
     labels.sort()
+    label_paths = [label_dir + "\\" + str(label) for label in labels]
     assert len(labels) == len(files), "length of labels and backgrounds does not match"
     for i in range(len(labels)):
-        img = skimage.io.imread(files[i])
-        lab = skimage.io.imread(labels[i])
+        img = skimage.io.imread(file_paths[i])
+        lab = skimage.io.imread(label_paths[i])
         backg = img_to_background(img, lab, kernel_dim)
-        skimage.io.imsave(save_dir + "/" + files_prefix + i + ".tiff", backg)
+        skimage.io.imsave(save_dir + "/" + files_prefix + str(i) + ".tiff", backg)
 
 
