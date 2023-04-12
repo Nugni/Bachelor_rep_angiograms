@@ -6,6 +6,8 @@ import os
 import skimage.io
 import cv2
 
+save_path = r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src\images_report"
+
 #go out to src folder
 sys.path.append(r'../..')
 
@@ -88,7 +90,11 @@ plt.hist([r[0]/r[1] for r in set6], alpha=0.5, label="set 6")
 plt.hist([r[0]/r[1] for r in set7], alpha=0.5, label="set 7")
 plt.hist([r[0]/r[1] for r in set8], alpha=0.5, label="set 8")
 plt.legend(loc="upper right")
-plt.show()
+plt.xlabel("Ratio")
+plt.ylabel("Obsevations")
+plt.title("Ratio between mean artery and background colors in different sets")
+#plt.show()
+plt.savefig(save_path + "/" + "color_ratio_in_sets.PNG")
 
 #%%
 """
@@ -110,15 +116,17 @@ ax[1].title.set_text("Annotated label")
 ax[1].imshow(test_lab.numpy()[0])
 ax[2].title.set_text("Eroted label")
 ax[2].imshow(eroted_lab_test)
-plt.title("Visualization of ground truth, annotation, and eroded annotation")
-plt.show()
+fig.xlabel("Visualization of ground truth, annotation, and eroded annotation")
+plt.savefig(save_path + "/" + "erode_annot_visualization.PNG")
+#plt.show()
 
 fig, ax = plt.subplots(1,2)
 ax[0].hist(art_sample_test)
 ax[1].hist(bg_sample_test)
-ax[0].title.set_text("artery colour")
-ax[1].title.set_text("background colour")
-plt.title("Example histograms of artery color and background color")
+ax[0].title.set_text("artery")
+ax[1].title.set_text("background")
+plt.xlabel("Color values")
+plt.savefig(save_path + "/" + "col_bg_art_example.PNG")
 plt.show()
 
 print(np.mean(bg_col_mean))
@@ -128,9 +136,10 @@ fig, ax = plt.subplots(1,3)
 ax[0].hist(art_col_mean, bins=20)
 ax[1].hist(bg_col_mean, bins=20)
 ax[2].hist([r[0]/r[1] for r in art_bg_ratio], bins=20)
-ax[0].title.set_text("mean artery colour")
-ax[1].title.set_text("mean background colour")
-ax[2].title.set_text("ratio of background and artery colors")
-plt.title("Mean artery and background colors")
-plt.show()
+ax[0].title.set_text("artery mean")
+ax[1].title.set_text("background mean")
+ax[2].title.set_text("ratio of bg and art")
+plt.xlabel("Mean artery and background colors, and ratio between these")
+plt.savefig(save_path + "/" + "mean_bg_art_colors.PNG")
+#plt.show()
 
