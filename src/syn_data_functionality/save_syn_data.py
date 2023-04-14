@@ -1,6 +1,7 @@
 from syn_data_functionality.tree_lib import Tree, gen_tree
 from syn_data_functionality.gen_input_from_label import labelToInput
 from data_sets import BackgroundData
+import bias_field
 import numpy as np
 import skimage.io
 import os
@@ -10,7 +11,7 @@ import random as rnd
 
 # generates num_samples synthetic trees and labels using tree_params_lst.
 # Saves these in data_dir and lab_dir folders respectively.
-def gen_syn_data(input_dir, label_dir, backgrounds_data_set, tree_params_lst, data_dims, num_samples):
+def gen_syn_data(input_dir, label_dir, backgrounds_data_set, tree_params_lst, data_dims, num_samples, bias_field_data_set):
     order_66(input_dir=input_dir, label_dir=label_dir)
     # load faktiske baggrunde
     # lav en dataloader, der shuffler(?). Behøver vi faktisk ikke
@@ -19,6 +20,10 @@ def gen_syn_data(input_dir, label_dir, backgrounds_data_set, tree_params_lst, da
         #Get random background from dataset
         idx = rnd.randint(0, len_bg_ds-1)
         bg = backgrounds_data_set[idx].numpy()[0] *255
+
+        # Apply bias field
+        bg = bias_field.add_bias_field(bg)
+
         #make label
         tree = Tree(*tree_params_lst)
         syn_lab = gen_tree(tree, data_dims)
