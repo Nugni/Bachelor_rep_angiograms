@@ -1,7 +1,7 @@
 from syn_data_functionality.tree_lib import Tree, gen_tree
 from syn_data_functionality.gen_input_from_label import labelToInput
 from data_sets import BackgroundData
-import bias_field
+import syn_data_functionality.bias_field as bias_field
 import numpy as np
 import skimage.io
 import os

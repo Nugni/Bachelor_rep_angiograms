@@ -57,50 +57,9 @@ def save_new_images(img_dir, label_dir, save_dir, func, files_prefix, restrict_v
             new_image = new_image.astype('uint8')
         io.imsave(save_dir + "/" + files_prefix + str(i) + ".tiff", new_image)
 
-def add_bias_field(image,bias_dir=r'C:\Users\jeppe\Desktop\Data\bias_fields_model'):
+def add_bias_field(image,bias_dir=r'Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\bias_fields_model'):
     bias_path = bias_dir + "\\" + rnd.choice(os.listdir(bias_dir))
     print(bias_path)
     bias_field = io.imread(bias_path)
     return_image = image + bias_field
     return return_image
-
-
-
-bgimg = io.imread(r'C:\Users\jeppe\Desktop\Data\Backgrounds\test_background1.tiff')
-
-from matplotlib import pyplot as plt, cm
-
-for i in range(5):
-
-    syn_bg = add_bias_field(bgimg)
-    plt.rcParams['image.cmap'] = 'gray' # set default colormap for imshow to be gray
-
-    fig, ax = plt.subplots(1, 2, figsize=(15,15))
-
-    ax[0].imshow(bgimg)
-    ax[1].imshow(syn_bg)
-    plt.show()
-
-"""
-# Can be deleted, only here for testing
-from matplotlib import pyplot as plt, cm
-plt.rcParams['image.cmap'] = 'gray' # set default colormap for imshow to be gray
-
-fig, ax = plt.subplots(1, 3, figsize=(15,15))
-
-image = io.imread(impath)
-bias_field = get_bias_field(impath,annotpath)
-unbiased_image = get_unbiased_image(impath,annotpath)
-
-def get_vals(input):
-    return input.min(), input.mean(), input.max()
-
-print([get_vals(x) for x in [image,bias_field,unbiased_image]])
-
-ax[0].imshow(image)
-ax[1].imshow(bias_field)
-ax[2].imshow(unbiased_image)
-plt.show()
-
-#print(unbiased_image)
-"""
