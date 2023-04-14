@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 import os
 import skimage.io
+import bias_field
+
 
 gaus_noise_var = 20.8
 
@@ -30,6 +32,10 @@ def add_noise(backg, lab_mask):
 def img_to_background(image, label, kernel_dim):
     image = image.astype('uint8')
     label = label.astype('uint8')
+
+    # removing bias from image
+    image = bias_field.get_unbiased_image(image,label)
+
     kernel = np.ones((kernel_dim, kernel_dim), np.uint8)
     thick_lab = cv2.dilate(label, kernel=kernel, iterations=1)
     #remove blood vessels
