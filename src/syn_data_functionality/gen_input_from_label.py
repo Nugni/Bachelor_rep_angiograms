@@ -3,46 +3,41 @@ import matplotlib.pyplot as plt
 import random as rnd
 from scipy.ndimage import gaussian_filter
 from scipy.stats import poisson
+from bias_field import add_bias_field
 
 # better idea; segment image. Make a mask. Then sample from either;
 #   1)inside mask for artery color.
 #   2) outside mask for background color
 
 # Add way to compute mean and std of arteries and background
-artery_mean = 30
-artery_std = 6
-backg_mean = 118
-backg_std = 7
+artery_ratio_mean = 0.654
+artery_ratio_std = 0.065
+art_ratio_min = 0.5
+art_ratio_max = 0.8
+
 std_gauss_filter = 2.4
+
 noise_var = 21
 
 # Methods to generate background and artery colors.
-def get_artery_col():
-    guess = rnd.gauss(artery_mean, artery_std)
-    if guess < 0:
-        guess = 0
-    elif guess > 230:
-        guess = 255
+def get_artery_ratio():
+    guess = rnd.gauss(artery_ratio_mean, artery_ratio_std)
+    if guess < art_ratio_min:
+        guess = art_ratio_min
+    elif guess > art_ratio_max:
+        guess = art_ratio_max
     return guess
 
-def get_backg_col():
-    guess = rnd.gauss(backg_mean, backg_std)
-    if guess < 0:
-        guess = 0
-    elif guess > 230:
-        guess = 230
-    return guess
 
 # Naive method of generating background and artery colors.
 # returns background and artery colors as tuple
-def gen_colors():
-    background_col = get_backg_col()
-    artery_col = get_artery_col()
-    #while background is somewhat darker or close to artery color find new
-    while (background_col < artery_col + 30):
-        background_col = get_backg_col()
-        artery_col = get_artery_col()
-    return background_col, artery_col
+def gen_art_color(background):
+    # compute ratio
+    artery_ratio = get_artery_ratio()
+    # compute artery color using ratio and mean background color
+    bg_mean_col = np.mean(background)
+    art_col = artery_ratio * bg_mean_col
+    return art_col
 
 def scale_img(arr):
     return arr/(np.max(arr)/1)
@@ -78,8 +73,8 @@ def put_together(bg, mult_map, noise_map, art_col):
 # Backgrounds should be a dataset
 def labelToInput(label, background):
     arr = np.array(label.copy()).astype(float)
-    # Generate background and artery color. For now, done in naive manner.
-    back_col, art_col = gen_colors()
+    # artery color. For now, done in naive manner.
+    art_col = gen_art_color(background)
     # apply blur scaled to 0-1
     scaled_blur_art = scale_blur_art(arr, std_gauss_filter)
 
@@ -90,6 +85,9 @@ def labelToInput(label, background):
     background = background
 
     img = put_together(background, scaled_blur_art, noise_map, art_col)
+
+    #add bias field last!
+    img = add_bias_field(img)
 
     return img
 
