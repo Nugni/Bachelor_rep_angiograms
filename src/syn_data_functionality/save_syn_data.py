@@ -8,6 +8,26 @@ import os
 import glob
 import torch.utils.data as td
 import random as rnd
+import math
+
+#startX = 200#5
+startY = 0#36 0
+#startAngle = 1.2 # 0
+starWidth = 20
+stopWidth = 2
+startLength = 20
+bifurcProb = 0.3 #should be changed to prop dist dependent on number of 'straigt' lines
+
+import random as rnd
+def make_ran_init_x_and_angle():
+    init = rnd.randint(0,2)
+    if init == 1:
+        startX = rnd.randint(50,100)
+        startAngle = rnd.uniform(math.pi/8,math.pi/8*3)
+    else:
+        startX = rnd.randint(350,400)
+        startAngle = rnd.uniform(math.pi/8*3,math.pi/8*5)
+    return startX, startAngle
 
 # generates num_samples synthetic trees and labels using tree_params_lst.
 # Saves these in data_dir and lab_dir folders respectively.
@@ -24,8 +44,12 @@ def gen_syn_data(input_dir, label_dir, backgrounds_data_set, tree_params_lst, da
         # Apply bias field
         bg = bias_field.add_bias_field(bg)
 
-        #make label
-        tree = Tree(*tree_params_lst)
+        # label init parameters
+        startX, startAngle = make_ran_init_x_and_angle()
+        lst = [startX, startY, starWidth, startLength, startAngle, stopWidth, bifurcProb]
+
+        # make label
+        tree = Tree(*lst)#tree_params_lst)
         syn_lab = gen_tree(tree, data_dims)
         #make data
         data = labelToInput(syn_lab, bg)
