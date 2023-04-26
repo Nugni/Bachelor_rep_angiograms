@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import random as rnd
 from scipy.ndimage import gaussian_filter
 from scipy.stats import poisson
+import sys
+sys.path.append("syn_data_functionality")
 from bias_field import add_bias_field
 
 # better idea; segment image. Make a mask. Then sample from either;
