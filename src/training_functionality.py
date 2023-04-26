@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import f1_score
 import torchvision.utils
+import torch
 
 #Function that given relevant parameters perform a training loop of some net
 #returns 2 lists of training and val loss for plotting loss as a function
@@ -11,7 +12,7 @@ def trainLoop(net, optimizer, criterion, device, epochs, train_loader, val_loade
     val_loss_lst = []
     for epoch in range(epochs):
         run_train_loss = 0.0
-        run_val_loss = 0.0
+        net.train()
         #iterate over training dataset
         for i, data in enumerate(train_loader, 0):
             inputs, labs = data
@@ -33,26 +34,39 @@ def trainLoop(net, optimizer, criterion, device, epochs, train_loader, val_loade
             optimizer.step()
 
             #print statistics:
-            run_train_loss = loss.item()
+            run_train_loss += loss.item()
             if i % print_interv == print_interv-1: #print every 10 minibatches
                 print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, run_train_loss / print_interv))
-                train_loss_lst.append(run_train_loss / print_interv)
-                running_loss = 0.0
+                  (epoch + 1, i + 1, loss.item()))
+        
+        train_loss_lst.append(run_train_loss/len(train_loader))
 
-                #compute some val error
-                val_input, val_lab = next(iter(val_loader))
+                ##compute some val error
+                #val_input, val_lab = next(iter(val_loader))
+#
+                ##move to device
+                #val_input, val_lab = val_input.to(device), val_lab.to(device)
+#
+                #val_out = net(val_input.float())
+#
+                #loss_val = criterion(input=val_out.float(), target=val_lab.float())
+                #run_val_loss = loss_val.item()
+#
+                #val_loss_lst.append(run_val_loss)
+                ##run_val_loss = 0.0
+        net.eval()
+        run_val_loss = 0.0
+        with torch.no_grad():
+            for i, data in enumerate(val_loader, 0):
+                inputs, labs = data
 
-                #move to device
-                val_input, val_lab = val_input.to(device), val_lab.to(device)
+                #transfer data to device, e.g. GPU
+                inputs, labs = inputs.to(device), labs.to(device)
+                outputs = net(inputs.float())
+                loss = criterion(input=outputs.float(), target=labs.float()) #.float() should fix int error
+                run_val_loss += loss.item()
+            val_loss_lst.append(run_val_loss/len(val_loader))
 
-                val_out = net(val_input.float())
-
-                loss_val = criterion(input=val_out.float(), target=val_lab.float())
-                run_val_loss = loss_val.item()
-
-                val_loss_lst.append(run_val_loss)
-                run_val_loss = 0.0
     print("Finished training! :^)")
     return train_loss_lst, val_loss_lst, net
 
