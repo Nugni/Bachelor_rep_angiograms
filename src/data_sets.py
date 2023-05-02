@@ -53,7 +53,7 @@ class SynData(torch.utils.data.Dataset):
         lab = skimage.io.imread(path_lab)
         #ensure lab has right values
         lab[lab > np.min(lab)] = 1
-        lab[lab < np.min(lab)] = 0
+        lab[lab < np.min(lab)] = 0 #should this not be lab[lab < 1] = 0?
         lab = ToTensor()(np.array(lab, dtype="int32"))
 
         #seed for transformations
@@ -141,7 +141,7 @@ class AngioData(torch.utils.data.Dataset):
         #print(np.max(data.numpy()[0]))
         #ensure lab has right values
         lab[lab > np.min(lab)] = 1
-        lab[lab < np.min(lab)] = 0
+        lab[lab < np.min(lab)] = 0 #should this not be lab[lab < 1] = 0?
         lab = ToTensor()(np.array(lab, dtype="int32"))
         #print(np.max(lab[0].numpy()))
 
