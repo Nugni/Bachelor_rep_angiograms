@@ -39,6 +39,7 @@ def gen_syn_data(input_dir, label_dir, backgrounds_data_set, data_dims, num_samp
     for i in range(num_samples):
         #Get random background from dataset
         idx = rnd.randint(0, len_bg_ds-1)
+        #backgrounds
         bg = backgrounds_data_set[idx].numpy()[0] *255
 
         # Apply bias field

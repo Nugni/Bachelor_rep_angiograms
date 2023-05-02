@@ -57,9 +57,10 @@ def save_new_images(img_dir, label_dir, save_dir, func, files_prefix, restrict_v
             new_image = new_image.astype('uint8')
         io.imsave(save_dir + "/" + files_prefix + str(i) + ".tiff", new_image)
 
-def add_bias_field(unbiased_background,bias_dir=r'Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\bias_fields_model'):
+#Add bias field to unbiased image
+def add_bias_field(unbiased_background, bias_dir=r'Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\bias_fields_model'):
     bias_path = bias_dir + "\\" + rnd.choice(os.listdir(bias_dir))
     bias_field = io.imread(bias_path)
-    unbiased_background = unbiased_background - unbiased_background.mean()
-    return_image = unbiased_background + bias_field
+    #unbiased_background = unbiased_background - unbiased_background.mean()
+    return_image = unbiased_background + bias_field - bias_field.mean()
     return return_image
