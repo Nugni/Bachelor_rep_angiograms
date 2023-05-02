@@ -42,14 +42,14 @@ def img_to_background(image, label, kernel_dim):
     background_no_vessels = inpaint_biharmonic(image, thick_lab)
     #ensure output is between 0 and 255
     background_no_vessels = rescale_img(background_no_vessels)
-    print(np.min(background_no_vessels))
-    print(np.max(background_no_vessels))
+    #print(np.min(background_no_vessels))
+    #print(np.max(background_no_vessels))
     #Add noise, where no noise is
     background_out = add_noise(background_no_vessels, thick_lab)
     return background_out
 
 #Given directory with original backgrounds, make backgrounds, save new backgrounds in directory.
-def make_backgrounds(img_dir, label_dir, save_dir, files_prefix, kernel_dim=8):
+def make_backgrounds(img_dir, label_dir, save_dir, files_prefix, num_bg = 3, kernel_dim=8):
     files = os.listdir(img_dir)
     files.sort()
     file_paths = [img_dir + "\\" + str(file) for file in files]
@@ -57,10 +57,15 @@ def make_backgrounds(img_dir, label_dir, save_dir, files_prefix, kernel_dim=8):
     labels.sort()
     label_paths = [label_dir + "\\" + str(label) for label in labels]
     assert len(labels) == len(files), "length of labels and backgrounds does not match"
-    for i in range(len(labels)):
+    for i in range(num_bg):
         img = skimage.io.imread(file_paths[i])
         lab = skimage.io.imread(label_paths[i])
+        #ensure label is binary
+        lab[lab > np.min(lab)] = 1
+        lab[lab < 1] = 0
+        lab = np.array(lab, dtype="int8")
         backg = img_to_background(img, lab, kernel_dim)
         skimage.io.imsave(save_dir + "/" + files_prefix + str(i) + ".tiff", backg)
+        print("[{0}/{1}] backgrounds finished".format(i+1, num_bg))
 
 
