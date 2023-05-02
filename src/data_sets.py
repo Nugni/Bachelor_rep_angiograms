@@ -50,7 +50,11 @@ class SynData(torch.utils.data.Dataset):
         data = ToTensor()(np.array(skimage.io.imread(path_data)))
         #read label
         path_lab = os.path.join(self.lab_dir, self.labs[idx])
-        lab = ToTensor()(skimage.io.imread(path_lab))
+        lab = skimage.io.imread(path_lab)
+        #ensure lab has right values
+        lab[lab > np.min(lab)] = 1
+        lab[lab < np.min(lab)] = 0
+        lab = ToTensor()(np.array(lab, dtype="int32"))
 
         #seed for transformations
         ii32 = np.iinfo(np.int32) #sample from as many ints as possible
@@ -103,9 +107,61 @@ class BackgroundData(torch.utils.data.Dataset):
 
 #Dataset class for action angio data
 class AngioData(torch.utils.data.Dataset):
-    def __init__(self):
-        self.num = 1
-    def __getitem__(self, index):
-        return None
+    def __init__(self, data_dir, label_dir, repeat_channels=False, transforms_both = None, transforms_train = None):
+        #save transformations
+        self.transforms_both = transforms_both
+        self.transforms_train = transforms_train
+        self.data_dir = data_dir
+        self.lab_dir = label_dir
+        self.repeat_channels = repeat_channels
+        #save placement of data and labels
+        self.get_data()
+
+    def get_data(self):
+        files = os.listdir(self.data_dir)
+        files.sort()
+        self.data = files
+        files_lab = os.listdir(self.lab_dir)
+        files_lab.sort()
+        self.labs = files_lab
+        #if number of element
+        if len(self.labs) != len(self.data):
+            raise ValueError("Not given the same number of labels and data")
+
     def __len__(self):
-        return -1
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        #read data
+        path_data = os.path.join(self.data_dir, self.data[idx])
+        data = ToTensor()(np.array(skimage.io.imread(path_data)))
+        #read label
+        path_lab = os.path.join(self.lab_dir, self.labs[idx])
+        lab = skimage.io.imread(path_lab)
+        #print(np.max(data.numpy()[0]))
+        #ensure lab has right values
+        lab[lab > np.min(lab)] = 1
+        lab[lab < np.min(lab)] = 0
+        lab = ToTensor()(np.array(lab, dtype="int32"))
+        #print(np.max(lab[0].numpy()))
+
+        #seed for transformations
+        ii32 = np.iinfo(np.int32) #sample from as many ints as possible
+        seed = np.random.randint(0, ii32.max)
+
+
+        #perform transformations
+        if self.transforms_train is not None:
+            data = perform_transform(data, seed, self.transforms_train)
+        if self.transforms_both is not None:
+            data = perform_transform(data, seed, self.transforms_both)
+            lab = perform_transform(lab, seed, self.transforms_both)
+
+        if self.repeat_channels:
+            data = torch.repeat_interleave(data[:, :, :], 3, axis=0)
+
+        return data, lab
+
+#change color of background
+def change_bckg_col(img):
+    return img
