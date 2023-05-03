@@ -1,8 +1,8 @@
 import sys
 
 #sys.path.insert(1, r"C:\Users\jeppe\Desktop\Bachelor_rep_angiograms\src")
-sys.path.insert(1, r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src")
-
+#sys.path.insert(1, r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src")
+sys.path.insert(1, r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\Bachelor_rep_angiograms\src")
 
 from gen_syn_backgrounds import make_backgrounds
 from save_syn_data import order_66
@@ -82,10 +82,3 @@ make_backgrounds(
     "bg_V_8_",
     num_bg =3
     )
-
-#make_backgrounds(
-#    r"Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\DataForBackgrounds\Orig",
-#    r"Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\DataForBackgrounds\Annotations",
-#    r"Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\Backgrounds",
-#    "background"
-#)
