@@ -4,16 +4,16 @@ from scipy.optimize import curve_fit
 import numpy as np
 import matplotlib.pyplot as plt
 #os.chdir(r'..')
-sys.path.append("..\..")
+sys.path.insert(1, r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\Bachelor_rep_angiograms\src")
 print(os.getcwd())
 
 #Get parameters to use for rest of script
 #Get data
 from parameter_estimation.information.edge_slices import slices
 #whether to generate new figures
-gen_figures = False
+gen_figures = True
 # Where we wish to save any figures made
-file_path = r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src\images_report"
+file_path = r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\Bachelor_rep_angiograms\src\images_report"
 
 #taken from
 #https://stackoverflow.com/questions/60160803/scipy-optimize-curve-fit-for-logistic-function
@@ -75,6 +75,7 @@ def illustrate_slice_fit_and_noise(file_name, path, img_slice, mu_gauss, popt_lo
     plt.title("Logistic fit of observed blood vessel edge and assumed edge")
     plt.legend()
     plt.savefig(path+"/"+file_name)
+    plt.show()
 
 stds = []
 
@@ -88,10 +89,13 @@ for s in slices:
 
 # Generate figures using only first slice if we wish
 if gen_figures:
-    s0 = slices[0]
+    s0 = slices[2]
     guess0 = [np.max(s0)-np.min(s0), len(s0)/2, 0.3, np.min(s0)]
     popt0 = fit_slice_to_logi(s0, guess0)
     popt_g0 = find_gauss_from_logi(popt0, s0, illustrate=True, file_name="gauss_fit_logi_derived.PNG", path = file_path)
     illustrate_slice_fit_and_noise("edge_visualization.PNG" , file_path ,s0, popt_g0[1], popt0)
 
 gauss_filter_std_mean = np.mean(stds)
+
+print(stds)
+print(gauss_filter_std_mean)

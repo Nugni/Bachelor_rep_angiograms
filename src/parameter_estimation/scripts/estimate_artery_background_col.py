@@ -7,11 +7,11 @@ import skimage.io
 import cv2
 import torch.utils.data as td
 
-save_path = r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src\images_report"
+save_path = r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\Bachelor_rep_angiograms\src\images_report"#r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src\images_report"
 
 #go out to src folder
 sys.path.append(r'../..')
-sys.path.insert(1, r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src\syn_data_functionality")
+sys.path.insert(1, r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\Bachelor_rep_angiograms\src\syn_data_functionality")#r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src\syn_data_functionality")
 
 from data_sets import SynData, BackgroundData
 from syn_data_functionality.bias_field import get_bias_field
@@ -201,6 +201,11 @@ print("Assume ratio between bg mean and artery mean is gauss distributed. Then w
 print("Further min ratio is: {:.3f} and max ratio is: {:.3f}".format(np.min([r[0]/r[1] for r in full_arr]),np.max([r[0]/r[1] for r in full_arr])))
 
 # %%
+
+import numpy as np
+import scipy.stats as stats
+import matplotlib.pylab as plt
+
 import matplotlib.pyplot as plt
 #for illustration/modelling purposes
 def gauss(x, A, x0, var):
@@ -209,21 +214,56 @@ def gauss(x, A, x0, var):
 def lognorm(x, A, x0, var):
     return gauss(np.log(x), A, x0, var)
 
-from scipy.optimize import curve_fit
 
-plt.figure()
-(y, bins, patches) = plt.hist([r[0]/r[1] for r in full_arr], bins=10)
-center_bins = bins[:-1] + np.diff(bins) / 2
-popt, pcov = curve_fit(lognorm, center_bins, y, p0 = [2, np.mean([r[0]/r[1] for r in full_arr]), np.var([r[0]/r[1] for r in full_arr])])
-x_for_ill = np.linspace(center_bins[0], center_bins[-1], 4000)
-plt.plot(x_for_ill, gauss(x_for_ill, *popt), label="Fitted lognormal function")
+counts, bins, _ = plt.hist([r[0]/r[1] for r in full_arr], bins=10, label="Observations")
+
+# restore data from histogram: counts multiplied bin centers
+restored = [[d]*int(counts[n]) for n, d in enumerate((bins[1:] + bins[:-1]) / 2)]
+
+# flatten
+restored = [item for sublist in restored for item in sublist]
+
+print("Parameters of fit of ratio: {0}, {1}, {2}".format(*stats.lognorm.fit(restored, loc=0)))
+
+dist = stats.lognorm(*stats.lognorm.fit(restored, loc=0))
+x = np.linspace(0.5, 0.8, 200)
+y = dist.pdf(x)
+#print(y)
+
+# the pdf is normalized, so we need to scale it to match the histogram
+#y = y/y.max()
+#y = y*counts.max()
+
+plt.plot(x,y,'r',linewidth=2, label="Fitted lognormal function")
 plt.xlabel("Ratio between artery mean and background mean (w/o bias field)")
 plt.ylabel("Number of observations")
 plt.legend()
 plt.savefig(save_path + "/" + "color_ratio_w_lognorm_fit.PNG")
-#plt.show()
+plt.show()
 
-print("parameters for lognormal fit of ratios are: {0}, {1}, {2}".format(*popt[0], *popt[1], *popt[2]))
+plt.figure()
+#dist = stats.lognorm(0.10853279865568646, 0.004975420331555992, 0.6307141388004951)
+#sample = dist.rvs(10)
+#x = np.linspace(0, 1, 200)
+#y = dist.cdf(x)
+#plt.plot(x,y,'r',linewidth=2)
+#plt.show()
+#from scipy.optimize import curve_fit
+
+#plt.figure()
+#(y, bins, patches) = plt.hist([r[0]/r[1] for r in full_arr], bins=10)
+#center_bins = bins[:-1] + np.diff(bins) / 2
+#print(y)
+#popt, pcov = curve_fit(gauss, center_bins, y, p0 = [2, np.mean([r[0]/r[1] for r in full_arr]), np.var([r[0]/r[1] for r in full_arr])])#, bounds=(0, 2))
+#x_for_ill = np.linspace(center_bins[0], center_bins[-1], 4000)
+#plt.plot(x_for_ill, gauss(x_for_ill, *popt), label="Fitted lognormal function")
+#plt.xlabel("Ratio between artery mean and background mean (w/o bias field)")
+#plt.ylabel("Number of observations")
+#plt.legend()
+#plt.savefig(save_path + "/" + "color_ratio_w_lognorm_fit.PNG")
+##plt.show()
+
+#print("parameters for lognormal fit of ratios are: {0}, {1}, {2}".format(*popt[0], *popt[1], *popt[2]))
 
 
 # %%

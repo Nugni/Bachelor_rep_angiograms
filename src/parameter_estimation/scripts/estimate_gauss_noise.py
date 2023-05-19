@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
-sys.path.append("..\..")
+sys.path.insert(1, r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\Bachelor_rep_angiograms\src")
 print(os.getcwd())
 
 from parameter_estimation.information.even_color_patches import patches_00, patches_01, patches_02, patches_04, patches_06, patches_07, patches_08
@@ -11,7 +11,7 @@ from parameter_estimation.information.even_color_patches import patches_00, patc
 
 
 Illustrate = True
-save_path = r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src\images_report"
+save_path = r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\Bachelor_rep_angiograms\src\images_report"#r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src\images_report"
 
 all_patches = np.concatenate((patches_00, patches_01, patches_02, patches_04, patches_06, patches_07, patches_08))
 
@@ -32,6 +32,7 @@ patches_indi = [patches_00, patches_04, patches_06]
 #IMPORTANT_DATA
 gauss_noise_std = np.std(tot_data)
 gauss_noise_mu = np.mean(tot_data)
+print(np.mean([np.std(p) for p in all_patches]))
 
 #gets center of bins, given bin edges
 def get_center_bins(bins_edges):
