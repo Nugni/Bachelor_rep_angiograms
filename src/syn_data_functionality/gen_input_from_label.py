@@ -2,32 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random as rnd
 from scipy.ndimage import gaussian_filter
-from scipy.stats import poisson
+from scipy.stats import poisson, lognorm
 import sys
 sys.path.append("syn_data_functionality")
-from bias_field import add_bias_field
+from syn_data_functionality.bias_field import add_bias_field
 
 # better idea; segment image. Make a mask. Then sample from either;
 #   1)inside mask for artery color.
 #   2) outside mask for background color
 
 # Add way to compute mean and std of arteries and background
-artery_ratio_mean = 0.654
-artery_ratio_std = 0.065
-art_ratio_min = 0.5
-art_ratio_max = 0.8
-
-std_gauss_filter = 2.4
-
-noise_var = 21
+ratio_lognorm_param = [0.09598047931952741, 0.005122247005933689, 0.6307223683557819]
+std_gauss_filter = 2.604
+noise_var = 4.164**2
 
 # Methods to generate background and artery colors.
 def get_artery_ratio():
-    guess = rnd.gauss(artery_ratio_mean, artery_ratio_std)
-    if guess < art_ratio_min:
-        guess = art_ratio_min
-    elif guess > art_ratio_max:
-        guess = art_ratio_max
+    ratio_dist = lognorm(*ratio_lognorm_param)
+    guess = ratio_dist.rvs(1)
     return guess
 
 
