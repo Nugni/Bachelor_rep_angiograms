@@ -11,6 +11,7 @@ save_path = r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angio
 
 #go out to src folder
 sys.path.append(r'../..')
+sys.path.insert(1, r"C:\Users\nugni\OneDrive\Skrivebord\Bachelor\git\Bachelor_rep_angiograms\src\syn_data_functionality")
 
 from data_sets import SynData, BackgroundData
 from syn_data_functionality.bias_field import get_bias_field
@@ -19,7 +20,8 @@ from syn_data_functionality.bias_field import get_bias_field
 
 erda_path = r"Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\Data"
 
-dataSet1 = SynData(r"Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\Data\ImsegmentedPt_02 V_1\Orig", r"Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\Data\ImsegmentedPt_02 V_1\manual")
+dataSet1 = SynData(r"Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\Data\ImsegmentedPt_02 V_1\Orig", r"Z:\dikuAngiograms\Projects\Jeppe Filippa Spring 2023\02\Data\ImsegmentedPt_02 V_1\Annotations")
+#dataSet3 = SynData(erda_path + r"\ImsegmentedPt_02 V_3\Orig" , erda_path + r"\ImsegmentedPt_02 V_3\Annotations")
 dataSet4 = SynData(erda_path + r"\ImsegmentedPt_02 V_4\Orig" , erda_path + r"\ImsegmentedPt_02 V_4\Annotations")
 dataSet6 = SynData(erda_path + r"\ImsegmentedPt_02 V_6\Orig" , erda_path + r"\ImsegmentedPt_02 V_6\Annotations")
 dataSet7 = SynData(erda_path + r"\ImsegmentedPt_02 V_7\Orig" , erda_path + r"\ImsegmentedPt_02 V_7\Annotations")
@@ -30,7 +32,7 @@ data_sets_lst = [dataSet1, dataSet4, dataSet6, dataSet7, dataSet8]
 min_set_len = np.min([len(ds) for ds in data_sets_lst])
 
 #Make balanced data sets
-data_subsets = [td.Subset(ds, np.random.choice(len(ds), min_set_len, replace= False)) for ds in data_sets_lst]
+data_subsets = [td.Subset(ds, (np.random.choice(len(ds), min_set_len, replace = False))) for ds in data_sets_lst]
 
 dataSet = td.ConcatDataset(data_subsets)
 
@@ -122,6 +124,8 @@ for i in range(len(data_subsets)):
         #    print("bg: {0}, art: {1}, dataidx: {2}".format(np.max(bg_sample), np.max(art_sample), i))
         bg_col_mean[i].append(np.mean(bg_sample))
         art_col_mean[i].append(np.mean(art_sample))
+        if np.mean(bg_col_mean[i]) <= 10:
+            print("ds: {0}, img: {1}".format(i, j))
     print("Finished set {0}".format(i))
 #%%
 
@@ -131,6 +135,7 @@ full_arr = [elm for sublst in art_bg_ratio for elm in sublst]
 
 #%%
 plt.hist([r[0]/r[1] for r in art_bg_ratio[0]], alpha=0.5, label="set 1")
+#plt.hist([r[0]/r[1] for r in art_bg_ratio[1]], alpha=0.5, label="set 3")
 plt.hist([r[0]/r[1] for r in art_bg_ratio[1]], alpha=0.5, label="set 4")
 plt.hist([r[0]/r[1] for r in art_bg_ratio[2]], alpha=0.5, label="set 6")
 plt.hist([r[0]/r[1] for r in art_bg_ratio[3]], alpha=0.5, label="set 7")
@@ -157,11 +162,11 @@ for i in range(len(dataSet)):
 #Visualization of data from example image
 fig, ax = plt.subplots(1,3)
 ax[0].title.set_text("Ground truth img")
-ax[0].imshow(test_dat.numpy()[0])
+ax[0].imshow(test_dat.numpy()[0], cmap="gray")
 ax[1].title.set_text("Annotated label")
-ax[1].imshow(test_lab.numpy()[0])
+ax[1].imshow(test_lab.numpy()[0], cmap="gray")
 ax[2].title.set_text("Eroted label")
-ax[2].imshow(eroted_lab_test)
+ax[2].imshow(eroted_lab_test, cmap="gray")
 plt.xlabel("Visualization of ground truth, annotation, and eroded annotation")
 plt.savefig(save_path + "/" + "erode_annot_visualization.PNG")
 #plt.show()
@@ -181,7 +186,7 @@ plt.show()
 fig, ax = plt.subplots(1,3)
 ax[0].hist([elm for sublst in art_col_mean for elm in sublst], bins=10)
 ax[1].hist([elm for sublst in bg_col_mean for elm in sublst], bins=10)
-ax[2].hist([r[0]/r[1] for r in full_arr], bins=15)
+ax[2].hist([r[0]/r[1] for r in full_arr], bins=10)
 ax[0].title.set_text("artery mean")
 ax[1].title.set_text("background mean")
 ax[2].title.set_text("ratio of bg and art")
@@ -193,6 +198,32 @@ plt.savefig(save_path + "/" + "mean_bg_art_colors.PNG")
 # %%
 print("Assume ratio between bg mean and artery mean is gauss distributed. Then we have mean: {:.3f} and std: {:.3f}".format(np.mean([r[0]/r[1] for r in full_arr]), np.std([r[0]/r[1] for r in full_arr])))
 # %%
-print(np.max([r[0]/r[1] for r in full_arr]))
+print("Further min ratio is: {:.3f} and max ratio is: {:.3f}".format(np.min([r[0]/r[1] for r in full_arr]),np.max([r[0]/r[1] for r in full_arr])))
+
+# %%
+import matplotlib.pyplot as plt
+#for illustration/modelling purposes
+def gauss(x, A, x0, var):
+    return A * np.exp(-(x - x0)**2 / (2 * var))
+
+def lognorm(x, A, x0, var):
+    return gauss(np.log(x), A, x0, var)
+
+from scipy.optimize import curve_fit
+
+plt.figure()
+(y, bins, patches) = plt.hist([r[0]/r[1] for r in full_arr], bins=10)
+center_bins = bins[:-1] + np.diff(bins) / 2
+popt, pcov = curve_fit(lognorm, center_bins, y, p0 = [2, np.mean([r[0]/r[1] for r in full_arr]), np.var([r[0]/r[1] for r in full_arr])])
+x_for_ill = np.linspace(center_bins[0], center_bins[-1], 4000)
+plt.plot(x_for_ill, gauss(x_for_ill, *popt), label="Fitted lognormal function")
+plt.xlabel("Ratio between artery mean and background mean (w/o bias field)")
+plt.ylabel("Number of observations")
+plt.legend()
+plt.savefig(save_path + "/" + "color_ratio_w_lognorm_fit.PNG")
+#plt.show()
+
+print("parameters for lognormal fit of ratios are: {0}, {1}, {2}".format(*popt[0], *popt[1], *popt[2]))
+
 
 # %%
