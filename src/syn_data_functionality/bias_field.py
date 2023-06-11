@@ -3,6 +3,11 @@ import numpy as np
 import os
 import random as rnd
 
+# The following code is heavily inspired by code found in another Jupyter notebook
+# where the bias field of MRI scans of rat brains was estimated and removed.  
+# The file in question was found at sporring.github.io and is located in the
+# folder "3_biasCorrect.zip". The file name is "BiasCorrect.ipynb"
+
 def get_bias_field(real_image, real_annotation):
     real_annotation_mask = real_annotation < 1
 
