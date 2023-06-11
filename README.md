@@ -1,10 +1,10 @@
-OVERALL
+# OVERALL
 
 The src repository contains all functionality for creating synthetic data and training models. 
 To train models and generate synthetic data, access to the "dikuAngiograms" repository on ERDA is required.
 
 
-GENERATING SYNTHETIC DATA
+# GENERATING SYNTHETIC DATA
 
 First in the command prompt navigate to the src.parameter_estimation folder.
 
@@ -27,7 +27,7 @@ Create synthetic data.
 	- Then run "python scripts.gen_syn_train_val_test.py"
 
 
-TRAINING MODELS
+# TRAINING MODELS
 
 Models are trained in the "Training.ipynb" notebook. 
 The notebook assumes the existance of folders for saving model weights, training loss and test metrics. 
