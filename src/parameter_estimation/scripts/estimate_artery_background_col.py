@@ -242,7 +242,7 @@ plt.savefig(save_path + "/" + "color_ratio_w_lognorm_fit.PNG")
 plt.show()
 
 plt.figure()
-#dist = stats.lognorm(0.10853279865568646, 0.004975420331555992, 0.6307141388004951)
+#dist = stats.lognorm(0.09598047931952741, 0.005122247005933689, 0.6307223683557819)
 #sample = dist.rvs(10)
 #x = np.linspace(0, 1, 200)
 #y = dist.cdf(x)

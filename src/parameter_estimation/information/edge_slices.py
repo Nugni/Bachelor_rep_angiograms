@@ -23,8 +23,6 @@ slice_6_33 = img_6_33[605:606, 648:667]
 
 slices = [slice1_4_33[0], slice2_4_33[0], slice_6_33[0]]
 
-print(slices)
-
 if illustrate:
     for s in slices:
         plt.imshow(np.array([s]), cmap="gray")

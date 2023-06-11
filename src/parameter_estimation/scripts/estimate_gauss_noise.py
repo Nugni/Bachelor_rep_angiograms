@@ -32,24 +32,31 @@ patches_indi = [patches_00, patches_04, patches_06]
 #IMPORTANT_DATA
 gauss_noise_std = np.std(tot_data)
 gauss_noise_mu = np.mean(tot_data)
-print(np.mean([np.std(p) for p in all_patches]))
+print(np.var(tot_data))
+print(np.var(flatten_and_normalize(patches_00)))
+print(np.var(flatten_and_normalize(patches_04)))
+print(np.var(flatten_and_normalize(patches_06)))
 
 #gets center of bins, given bin edges
 def get_center_bins(bins_edges):
     return bins_edges[:-1] + np.diff(bins_edges) / 2
 
 if Illustrate:
-    plt.title("Pixel values from all patches, normalized")
+    plt.title("Pixel values from all patches(mean centered)")
     (y, bins, patches) = plt.hist(tot_data, bins=20)
     center_bins = get_center_bins(bins)
     popt, pcov = curve_fit(gauss, center_bins, y, p0 = [np.max(y), 0, 20])
     x_for_ill = np.linspace(center_bins[0], center_bins[-1], 4000)
     plt.plot(x_for_ill, gauss(x_for_ill, *popt))
-    plt.xlabel("Normalized pixel value")
+    plt.xlabel("Relative pixel value")
     plt.ylabel("Number of observations")
     plt.savefig(save_path + "/" + "hist_noise.PNG")
 
-    fig, ax = plt.subplots(1,len(patches_indi))
-    for i in range(len(patches_indi)):
-        ax[i].hist(flatten_and_normalize(patches_indi[i]))
-    plt.show()
+    #fig, ax = plt.subplots(1,len(patches_indi))
+    for i in range(len(["IMG00000_07.tiff", "IMG00004_33.tiff", "IMG00006_02.tiff"])):
+        plt.figure()
+        #plt.title("Patches from " + ["IMG00000_07.tiff", "IMG00004_33.tiff", "IMG00006_02.tiff"][i])
+        #plt.xlabel("Relative pixel value")
+        #plt.ylabel("Number of observations")
+        plt.hist(flatten_and_normalize(patches_indi[i]), bins=20)
+        plt.savefig(save_path + "/" +  ["IMG00000_07.tiff", "IMG00004_33.tiff", "IMG00006_02.tiff"][i] + "_hist_noise.PNG")
