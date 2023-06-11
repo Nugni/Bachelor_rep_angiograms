@@ -47,13 +47,13 @@ class SynData(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         #read data
         path_data = os.path.join(self.data_dir, self.data[idx])
-        data = ToTensor()(np.array(skimage.io.imread(path_data)))
+        data = ToTensor()(np.array(skimage.io.imread(path_data))).float()
         #read label
         path_lab = os.path.join(self.lab_dir, self.labs[idx])
         lab = skimage.io.imread(path_lab)
         #ensure lab has right values
         lab[lab > np.min(lab)] = 1
-        lab[lab < np.min(lab)] = 0 #should this not be lab[lab < 1] = 0?
+        lab[lab < np.max(lab)] = 0 #should this not be lab[lab < 1] = 0?
         lab = ToTensor()(np.array(lab, dtype="int32"))
 
         #seed for transformations
