@@ -6,19 +6,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image, ImageDraw
 
+#Lognormal cdf of probability of bifurcating after 0, 1, .. linepieces. 
 bifurc_cdf = [0, 0.17819338490705852, 0.4948775648691266, 0.796706906909377, 0.9509823643337217, 0.9932718619501374, 0.9994886850041991, 0.9999788076670704, 0.9999995301294428, 1]
-bifurc_angle_model = GaussianMixture(2)
-bifurc_angle_model.means_ = np.array([[-46.68106076], [ 38.07296841]])
-bifurc_angle_model.weights_ = np.array([0.4882134, 0.5117866])
-bifurc_angle_model.covariances_ = np.array([[[569.53799684]], [[974.55896059]]])
-bifurc_angle_model.prec = np.array([[[0.00175581]], [[0.00102611]]])
 
 
 def gen_new_length(width, length_ratio_mean, length_ratio_std): #, smallest_next_length_ratio):
     # Get ratio between current and next length
-    next_length_ratio = np.random.normal(0.10354471, 0.15610471) #length_ratio_mean, length_ratio_std)
-    while next_length_ratio < 0.3: # smallest_next_length_ratio:
-        next_length_ratio = np.random.normal(0.10354471, 0.15610471) #length_ratio_mean, length_ratio_std)
+    next_length_ratio = np.random.lognormal(-2.1367, 0.6427)#np.random.normal(0.10354471, 0.15610471)#np.random.lognormal(-2.1367, 0.6427)##np.random.lognormal(-2.1367, 0.6427)#np.random.normal(0.10354471, 0.15610471) #length_ratio_mean, length_ratio_std)
+    while next_length_ratio < 0.25:#3:#0.2:#0.3: #0.25: # smallest_next_length_ratio:
+        next_length_ratio = np.random.lognormal(-2.1367, 0.6427)#np.random.normal(0.10354471, 0.15610471)#np.random.lognormal(-2.1367, 0.6427)#np.random.lognormal(-2.1367, 0.6427) #length_ratio_mean, length_ratio_std)
     new_length = width / next_length_ratio
 
     # constricting length: 10 < length < 80

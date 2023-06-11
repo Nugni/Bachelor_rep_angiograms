@@ -10,7 +10,7 @@ from torchvision.transforms import RandomRotation, RandomResizedCrop, RandomHori
 
 
 # number of samples to generate. Uses 0.6, 0.2, 0.2 split
-num_samples = 2000
+num_samples = 5000
 
 # directory to save data to. Assumes in this there are sub-directories
 # train, test and val
