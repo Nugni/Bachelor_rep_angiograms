@@ -15,8 +15,8 @@ startY = 0#36 0
 #startAngle = 1.2 # 0
 starWidth = 20
 stopWidth = 2
-startLength = 20
-bifurcProb = 0.3 #should be changed to prop dist dependent on number of 'straigt' lines
+#startLength = 20
+#bifurcProb = 0.3 #should be changed to prop dist dependent on number of 'straigt' lines
 
 import random as rnd
 def make_ran_init_x_and_angle():
@@ -47,7 +47,7 @@ def gen_syn_data(input_dir, label_dir, backgrounds_data_set, data_dims, num_samp
 
         # label init parameters
         startX, startAngle = make_ran_init_x_and_angle()
-        lst = [startX, startY, starWidth, startLength, startAngle, stopWidth, bifurcProb]
+        lst = [startX, startY, starWidth, startAngle, stopWidth]
 
         # make label
         tree = Tree(*lst)#tree_params_lst)

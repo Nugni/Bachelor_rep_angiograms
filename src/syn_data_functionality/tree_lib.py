@@ -10,11 +10,11 @@ from PIL import Image, ImageDraw
 bifurc_cdf = [0, 0.17819338490705852, 0.4948775648691266, 0.796706906909377, 0.9509823643337217, 0.9932718619501374, 0.9994886850041991, 0.9999788076670704, 0.9999995301294428, 1]
 
 
-def gen_new_length(width, length_ratio_mean, length_ratio_std): #, smallest_next_length_ratio):
+def gen_new_length(width): #, smallest_next_length_ratio):
     # Get ratio between current and next length
-    next_length_ratio = np.random.lognormal(-2.1367, 0.6427)#np.random.normal(0.10354471, 0.15610471)#np.random.lognormal(-2.1367, 0.6427)##np.random.lognormal(-2.1367, 0.6427)#np.random.normal(0.10354471, 0.15610471) #length_ratio_mean, length_ratio_std)
-    while next_length_ratio < 0.25:#3:#0.2:#0.3: #0.25: # smallest_next_length_ratio:
-        next_length_ratio = np.random.lognormal(-2.1367, 0.6427)#np.random.normal(0.10354471, 0.15610471)#np.random.lognormal(-2.1367, 0.6427)#np.random.lognormal(-2.1367, 0.6427) #length_ratio_mean, length_ratio_std)
+    next_length_ratio = np.random.lognormal(-2.1367, 0.6427)#np.random.normal(0.10354471, 0.15610471)
+    while next_length_ratio < 0.3:#0.3: # smallest_next_length_ratio:
+        next_length_ratio = np.random.lognormal(-2.1367, 0.6427)
     new_length = width / next_length_ratio
 
     # constricting length: 10 < length < 80
@@ -29,21 +29,14 @@ def gen_new_length(width, length_ratio_mean, length_ratio_std): #, smallest_next
 #Synthetic angogram class: Node
 class Node:
     def __init__(self, coord, width,
-                 prev_length, angle,
-                 bifurc_prob, bifurc_big_left,
-                 stdMul,
-                 length_ratio_mean, length_ratio_std,
+                 angle, 
+                 bifurc_big_left,
                  counter,
                  single_child_width_ratio = 0.98):
         self.coord = coord
         self.width = width
-        self.prev_length = prev_length
         self.angle = angle
-        self.bifurc_prob = bifurc_prob
         self.bifurc_big_left = bifurc_big_left
-        self.stdMul = stdMul
-        self.length_ratio_mean = length_ratio_mean
-        self.length_ratio_std = length_ratio_std
         self.single_child_width_ratio = single_child_width_ratio
         self.counter = counter
         self.children = []
@@ -53,11 +46,11 @@ class Node:
         # Find new width
         new_width = self.width*ratio_width
         # Find new coordinates
-        new_length = gen_new_length(new_width , self.length_ratio_mean, self.length_ratio_std)
+        new_length = gen_new_length(new_width)
         cur_x, cur_y = self.coord
         new_x, new_y = cur_x + math.cos(angle)*new_length, cur_y + math.sin(angle)*new_length
 
-        return Node((new_x,new_y), new_width, new_length, angle, self.bifurc_prob, self.bifurc_big_left, self.stdMul, self.length_ratio_mean, self.length_ratio_std, counter)
+        return Node((new_x,new_y), new_width, angle, self.bifurc_big_left, counter)
 
     # Creates and add either 1 or 2 children to the parent node
     def add_children(self, stop_width):
@@ -95,14 +88,13 @@ class Node:
 
 #Synthetic Angiogram class: Tree
 class Tree:
-    def __init__(self, x, y, width, prev_length, angle, stop_width, angle_std_mul = 0.0, bifurc_prob=0.3, bifurc_big_left = 0.5, length_ratio_mean = 0.95, length_ratio_std=0.43):
+    def __init__(self, x, y, width, angle, stop_width, bifurc_big_left = 0.5):
         self.stop_width = stop_width
-        self.angle_std_mul = angle_std_mul
-        self.add_root(x,y, width, prev_length, angle, bifurc_prob, bifurc_big_left, length_ratio_mean, length_ratio_std)
+        self.add_root(x,y, width, angle, bifurc_big_left)
         self.make_tree()
 
-    def add_root(self, x, y, width, prev_length, angle, bifurc_prob, bifurc_big_left, length_ratio_mean, length_ratio_std):
-        self.root = Node((x,y), width, prev_length, angle, bifurc_prob, bifurc_big_left, self.angle_std_mul, length_ratio_mean, length_ratio_std, 1)
+    def add_root(self, x, y, width, angle, bifurc_big_left):
+        self.root = Node((x,y), width, angle, bifurc_big_left, 1)
 
     def grow_tree(self, node):
         if node.width < self.stop_width:
